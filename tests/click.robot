@@ -5,6 +5,8 @@ Library    AppiumLibrary
 *** Variables ***
 ${START}    QAX
 
+
+
 *** Test Cases ***
 
 
@@ -51,6 +53,7 @@ Clicar no botao
     Click Element    ${btnclicksimples}
     
     
+
 Preencher Checklist
     
     ${hamburger}    Set Variable    //android.widget.ImageButton[@content-desc="Open navigation drawer"]
@@ -81,9 +84,6 @@ Preencher Checklist
     Click Text    Robot Framework
     
     
-
-
-
 
 Clicar nos Botões de Radio
     
