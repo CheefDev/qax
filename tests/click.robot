@@ -30,8 +30,7 @@ Clicar no botao
     ${menuclicksimples}    Set Variable    //android.widget.TextView[@resource-id="com.qaxperience.yodapp:id/tvItemTitle" and @text="Clique simples"]
     ${btnclicksimples}    Set Variable    //android.widget.Button[@resource-id="com.qaxperience.yodapp:id/short_click"]
     ${msgclicksimples}    Set Variable    //*[@text="Isso é um clique simples"]
-    
-    
+   
     
     Wait Until Element Is Visible    ${hamburger}    5
     Click Element    ${hamburger}
@@ -52,10 +51,72 @@ Clicar no botao
     Click Element    ${btnclicksimples}
     
     
+Preencher Checklist
+    
+    ${hamburger}    Set Variable    //android.widget.ImageButton[@content-desc="Open navigation drawer"]
+    ${backbutton}    Set Variable    //android.widget.ImageView[@resource-id="com.qaxperience.yodapp:id/ivBack"]
+    ${hcheckradio}    Set Variable    //android.widget.TextView[@resource-id="com.qaxperience.yodapp:id/tvItemTitle" and @text="Check e Radio"]
+    ${menucheckbox}    Set Variable    //android.widget.TextView[@resource-id="com.qaxperience.yodapp:id/tvItemTitle" and @text="Checkbox"]
+    ${chckcontainer}    Set Variable    //android.widget.LinearLayout[@resource-id="com.qaxperience.yodapp:id/fragment"]/android.widget.FrameLayout
 
+    Wait Until Element Is Visible    ${backbutton}    15
+    Click Element    ${backbutton}
+
+    Wait Until Element Is Visible    ${hamburger}    
+    Click Element    ${hamburger}
+
+    Wait Until Element Is Visible     ${hcheckradio}    
+    Click Element     ${hcheckradio}
+
+    Wait Until Element Is Visible    ${menucheckbox}    
+    Click Element    ${menucheckbox}
+    
+    Wait Until Element Is Visible    ${chckcontainer}    
+    Click Text    Ruby
+    Click Text    Python
+    Click Text    Java
+    Click Text    Javascript
+    Click Text    Cobol
+    Click Text    C#
+    Click Text    Robot Framework
+    
+    
+
+
+
+
+Clicar nos Botões de Radio
+    
+    ${hamburger}    Set Variable    //android.widget.ImageButton[@content-desc="Open navigation drawer"]
+    ${backbutton}    Set Variable    //android.widget.ImageView[@resource-id="com.qaxperience.yodapp:id/ivBack"]
+    
+    ${hcheckradio}    Set Variable    //android.widget.TextView[@resource-id="com.qaxperience.yodapp:id/tvItemTitle" and @text="Check e Radio"]
+    ${menucheckbox}    Set Variable    //android.widget.TextView[@resource-id="com.qaxperience.yodapp:id/tvItemTitle" and @text="Checkbox"]
+    ${menubtnradio}    Set Variable    //android.widget.TextView[@resource-id="com.qaxperience.yodapp:id/tvItemTitle" and @text="Botões de radio"]
+    ${radiocontainer}    Set Variable    //android.widget.LinearLayout[@resource-id="com.qaxperience.yodapp:id/fragment"]/android.widget.FrameLayout
+    
     Wait Until Element Is Visible    ${backbutton}
     Click Element    ${backbutton}
     
-    Sleep    5
     
+    Wait Until Element Is Visible    ${hamburger}    
+    Click Element    ${hamburger}
+    
+    Wait Until Element Is Visible    ${hcheckradio}    
+    Click Element    ${hcheckradio}
+
+
+    Wait Until Element Is Visible    ${menubtnradio}    
+    Click Element    ${menubtnradio}
+
+    Wait Until Element Is Visible    ${radiocontainer}
+    Click Text    Java
+    Click Text    C#
+    Click Text    Ruby
+    Click Text    Python
+    Click Text    Javascript
+    Click Text    Elixir
+    Click Text    Go Lang
+
+    Sleep    5
     Close Application
