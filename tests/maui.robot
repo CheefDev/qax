@@ -9,8 +9,12 @@ ${saveButton}      //android.widget.ImageButton[@content-desc="Navigate up"]
 
 ${menuSuperior}    //android.widget.ImageButton[@content-desc="Open navigation drawer"]
 ${menuOptions}     //android.widget.ImageView[@content-desc="More options"]
+${btnVoltar}       android=UiSelector().description("Navigate up")
+${btnSalvar}       android=UiSelector().description("Navigate up")
 ${message}         //android.widget.TextView[@resource-id="android:id/message"]
 ${appPackage}      com.engemanmaui.portocel
+
+
 *** Test Cases ***
 
 Abrir Tela Principal
@@ -91,6 +95,7 @@ Logar no app
 
     
 Cadastro OS Local
+    
     ${sResponsavel}        Set Variable    android=UiSelector().className("android.widget.ImageView").instance(4)
     ${sSolicitante}        Set Variable    android=UiSelector().className("android.widget.ImageView").instance(7)
     ${Solicitacao}         Set Variable    //androidx.drawerlayout.widget.DrawerLayout/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[2]/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup/android.widget.EditText[4]
@@ -102,8 +107,11 @@ Cadastro OS Local
     ${sAplicacao}          Set Variable    android=UiSelector().className("android.widget.ImageView").instance(15)
     ${sCentroCusto}        Set Variable    android=UiSelector().className("android.widget.ImageView").instance(18)
     
-    ${btnOk}     Set Variable    //android.widget.Button[@resource-id="android:id/button2"]
-    ${btnSim}    Set Variable    //android.widget.Button[@resource-id="android:id/button1"]
+    ${btnOk}               Set Variable    //android.widget.Button[@resource-id="android:id/button2"]
+    ${btnSim}              Set Variable    //android.widget.Button[@resource-id="android:id/button1"]
+    ${newOSButton}         Set Variable    //android.widget.Button
+    
+    
     
     Menu Superior    Ordem de Serviço
     Wait Until Page Contains    O.S. Mobile
@@ -111,7 +119,7 @@ Cadastro OS Local
     Click Text    O.S. Mobile
     Wait Until Page Contains    Lista de O.S.
 
-    ${newOSButton}    Set Variable     //android.widget.Button
+    
     
     Click Element    ${newOSButton}
     Wait Until Page Contains    Cadastro da O.S.
@@ -154,6 +162,83 @@ Cadastro OS Local
 
     Wait Until Page Contains       Lista de O.S.'s
 
+    Click Element    ${btnVoltar}
+
+    Menu Superior    Ordem de Serviço
+    Wait Until Page Contains    O.S. Mobile
+
+    Click Text    O.S. Mobile
+    Wait Until Page Contains    Lista de O.S.
+    
+    Click Element    android=UiSelector().className("android.view.ViewGroup").instance(14)
+    
+Cadastrar Anexo
+
+    ${btnAnexo}              Set Variable     android=UiSelector().text("Anexos")
+    ${newAnexoButton}        Set Variable     //android.widget.Button
+    ${optAnexoSimples}       Set Variable     //android.widget.TextView[@resource-id="android:id/text1" and @text="Anexo"]
+    ${optAnexoMultiplo}      Set Variable     //android.widget.TextView[@resource-id="android:id/text1" and @text="Anexos múltiplos"]
+    ${btnSelecionarAnexo}    Set Variable     android=UiSelector().text("Selecionar Anexo")
+    ${btnCamera}             Set Variable     android=UiSelector().resourceId("com.android.camera2:id/shutter_button")
+    ${btnDone}               Set Variable     android=UiSelector().resourceId("com.android.camera2:id/done_button")
+    
+    Click Element    ${btnAnexo}
+    Wait Until Page Contains    Listagem de Anexo
+    
+    Click Element     ${newAnexoButton}
+    Wait Until Page Contains    Inserir Anexo
+
+    Click Element    ${optAnexoSimples}
+    Wait Until Element Is Visible    ${btnSelecionarAnexo}
+
+    Click Element    ${btnSelecionarAnexo}
+    Wait Until Element Is Visible    android=UiSelector().resourceId("com.engemanmaui.portocel:id/parentPanel")
+    Click Element    android=UiSelector().text("Câmera")
+
+    Wait Until Element Is Visible    ${btnCamera}
+    Click Element    ${btnCamera}
+
+    Wait Until Element Is Visible    ${btnDone}
+    Click Element    ${btnDone}
+
+    Wait Until Element Is Visible    ${btnSalvar}
+    Click Element    ${btnSalvar}
+    
+    
+    ${btnVoltar}    Set Variable    android=UiSelector().description("Navigate up")
+    Wait Until Element Is Visible    ${btnVoltar}
+    Click Element    ${btnVoltar}
+    
+
+    Wait Until Page Contains    O.S.
+
+Cadastrar Assinatura
+    ${btnAssinatura}         Set Variable     android=UiSelector().text("Assinatura")
+    ${btnNovaAssinatura}     Set Variable     android=UiSelector().className("android.widget.Button")
+    ${campoDescricao}        Set Variable     android=UiSelector().className("android.widget.EditText").instance(0)
+    ${btnSalvar}             Set Variable     android=UiSelector().description("Navigate up")
+    
+    
+    Click Element    ${btnAssinatura}
+    Wait Until Element Is Visible    ${btnNovaAssinatura}
+
+    Click Element    ${btnNovaAssinatura}
+    Wait Until Element Is Visible    ${campoDescricao}
+
+    Input Text    ${campoDescricao}    Assinatura Automatizada
+    
+    Swipe    ${124}    ${815}    ${834}    ${2087}
+    Swipe    ${834}    ${944}    ${124}    ${2018}
+    
+    Sleep    1
+
+    Click Element    android=UiSelector().description("Navigate up")
+    Wait Until Page Contains    Listagem de Assinaturas
+    
+    Click Element    android=UiSelector().description("Navigate up")
+    Wait Until Page Contains    O.S.
+
+
 *** Keywords ***
 
 Scroll to
@@ -164,7 +249,8 @@ Scroll to
 
 Click Salvar
 
-
+    ${saveButton}    Set Variable    android=UiSelector().description("Navigate up")
+    
     Wait Until Element Is Visible    ${saveButton}    20
     Click Element    ${saveButton}
     Wait Until Page Contains      Configurações
