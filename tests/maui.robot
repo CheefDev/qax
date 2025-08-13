@@ -1,6 +1,7 @@
 *** Settings ***
 
 Library    AppiumLibrary
+Library    Process
 
 *** Variables ***
 
@@ -29,6 +30,7 @@ Abrir Tela Principal
 
 
 Digitar Webservice
+    [Tags]    Geracao Banco    Configuracao
     ${cfgButton}    Set Variable     //androidx.recyclerview.widget.RecyclerView/android.view.ViewGroup[1]/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.widget.ImageView[1]
     ${wsField}      Set Variable     //androidx.drawerlayout.widget.DrawerLayout/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[2]/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[1]/android.widget.EditText
     ${lastField}    Set Variable     //android.widget.EditText[@text="Escolher"]
@@ -46,7 +48,7 @@ Digitar Webservice
 
 
 Gerar Banco de Dados
-    
+    [Tags]    Geracao Banco
     ${btnNao}    Set Variable    //android.widget.Button[@resource-id="android:id/button2"]
     
     
@@ -70,14 +72,11 @@ Gerar Banco de Dados
 
     Sleep    2
 
-
-Reabrir Aplicação
-
     Activate Application    com.engemanmaui.portocel
     Sleep    5
 
 Logar no app
-
+    [Tags]    Login
     ${loginField}      Set Variable    //android.widget.EditText[@text="Usuário"]
     ${passField}       Set Variable    //android.widget.EditText[@text="Senha"]
     ${buttonEntrar}    Set Variable    //android.widget.TextView[@text="Entrar"]
@@ -95,6 +94,7 @@ Logar no app
 
     
 Cadastro OS Local
+    [Tags]    Cadastro    OS
     
     ${sResponsavel}        Set Variable    android=UiSelector().className("android.widget.ImageView").instance(4)
     ${sSolicitante}        Set Variable    android=UiSelector().className("android.widget.ImageView").instance(7)
@@ -173,7 +173,8 @@ Cadastro OS Local
     Click Element    android=UiSelector().className("android.view.ViewGroup").instance(14)
     
 Cadastrar Anexo
-
+    [Tags]    Cadastro    OS    Anexo
+    
     ${btnAnexo}              Set Variable     android=UiSelector().text("Anexos")
     ${newAnexoButton}        Set Variable     //android.widget.Button
     ${optAnexoSimples}       Set Variable     //android.widget.TextView[@resource-id="android:id/text1" and @text="Anexo"]
@@ -213,6 +214,8 @@ Cadastrar Anexo
     Wait Until Page Contains    O.S.
 
 Cadastrar Assinatura
+    [Tags]    Cadastro    OS    Assinatura
+    
     ${btnAssinatura}         Set Variable     android=UiSelector().text("Assinatura")
     ${btnNovaAssinatura}     Set Variable     android=UiSelector().className("android.widget.Button")
     ${campoDescricao}        Set Variable     android=UiSelector().className("android.widget.EditText").instance(0)
@@ -227,8 +230,8 @@ Cadastrar Assinatura
 
     Input Text    ${campoDescricao}    Assinatura Automatizada
     
-    Swipe    ${124}    ${815}    ${834}    ${2087}
-    Swipe    ${834}    ${944}    ${124}    ${2018}
+    Swipe    ${124}    ${815}    ${834}    ${2087}    500
+    Swipe    ${834}    ${815}    ${124}    ${2087}    500
     
     Sleep    1
 
@@ -238,14 +241,59 @@ Cadastrar Assinatura
     Click Element    android=UiSelector().description("Navigate up")
     Wait Until Page Contains    O.S.
 
+Cadastro Registro Funcionario
+    [Tags]    Cadastro    OS    Funcionario
+    
+    ${btnFuncionario}       Set Variable    android=UiSelector().text("Funcionários")
+    ${btnNewFuncionario}    Set Variable    android=UiSelector().className("android.widget.Button")
+    ${sFuncionario}         Set Variable    android=UiSelector().className("android.widget.ImageView").instance(2)
+    ${option1}              Set Variable    android=UiSelector().className("android.view.ViewGroup").instance(14)
+    ${calendarInicio}       Set Variable    android=UiSelector().className("android.widget.ImageView").instance(5)
+    ${calendarTermino}      Set Variable    android=UiSelector().className("android.widget.ImageView").instance(7)
+    ${btnData}              Set Variable    android=UiSelector().className("android.widget.Button").instance(0)
+    ${btnHorario}           Set Variable    android=UiSelector().className("android.widget.Button").instance(1)
+    ${btnHora}              Set Variable    android=UiSelector().className("android.widget.EditText").instance(3)
+    ${list}                 Set Variable    android=UiSelector().resourceId("com.engemanmaui.portocel:id/select_dialog_listview")
+    ${btnOK}                Set Variable    android=UiSelector().text("OK")
+    ${btnCancel}            Set Variable    android=UiSelector().text("Cancelar")
+    ${btnSim}               Set Variable    android=UiSelector().resourceId("android:id/button1")
+    
+    
+    Click Element    ${btnFuncionario}
+    Wait Until Element Is Visible    ${btnNewFuncionario}
+    
+    Click Element    ${btnNewFuncionario}
+    Wait Until Element Is Visible    ${sFuncionario}
+
+    Click Element    ${sFuncionario}
+    Wait Until Element Is Visible    ${option1}
+
+    Click Element    ${option1}
+    Wait Until Element Is Visible    ${calendarInicio}
+
+    Click Element    ${calendarInicio}
+    Wait Until Element Is Visible    ${btnOK}
+    Click Element    ${btnOK}
+
+    Click Element    ${calendarTermino}
+    Wait Until Element Is Visible    ${btnOK}
+    Click Element    ${btnOK}
+
+
+    Click Element    android=UiSelector().description("Navigate up")
+    Wait Until Page Contains    Registros de Funcionários
+
+      
+    Run Keyword And Ignore Error    Wait Until Element Is Visible    ${btnSim}
+    Run Keyword And Ignore Error    Click Element    ${btnSim}
+
+    Click Element    android=UiSelector().description("Navigate up")
+    Wait Until Page Contains    O.S.
+
+
 
 *** Keywords ***
 
-Scroll to
-    [Arguments]    ${element}
-    
-
-    Run Keyword And Ignore Error    Scroll Down    ${element}
 
 Click Salvar
 
@@ -274,6 +322,7 @@ Menu Options
     
     Sleep    2
     Click Text    ${option_text}    
+
 Campo Pesquisa
     [Arguments]    ${locator}    ${elementPosition}
 
@@ -281,7 +330,9 @@ Campo Pesquisa
     Wait Until Page Contains    Pesquisa
     Sleep    1
     Click Element    //android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[2]/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.widget.ImageView[1]
-    Sleep    2
+    
+    Sleep    1
+    
     Run Keyword And Continue On Failure    
     ...    Click Element    //androidx.recyclerview.widget.RecyclerView/android.view.ViewGroup[${elementPosition}]/android.view.ViewGroup
 
