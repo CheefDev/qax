@@ -23,7 +23,7 @@ Abrir Tela Principal
     Open Application    http://localhost:4723
     ...            platformName=Android
     ...            automationName=UIAutomator2
-    ...            app=C:\\QAx\\projects\\Maui\\com.engemanmaui.portocel.apk
+    ...            app=C:\\QAx\\projects\\Maui\\engemanmaui.apk
     ...            autoGrantPermissions=true
     
     Wait Until Page Contains    Portocel    20
@@ -45,7 +45,7 @@ Digitar Webservice
     Input Text    ${wsField}    ${webservice}
 
     Click Salvar
-
+    Wait Until Page Contains      Configurações
 
 Gerar Banco de Dados
     [Tags]    Geracao Banco
@@ -162,7 +162,7 @@ Cadastro OS Local
 
     Wait Until Page Contains       Lista de O.S.'s
 
-    Click Element    ${btnVoltar}
+    Click Salvar
 
     Menu Superior    Ordem de Serviço
     Wait Until Page Contains    O.S. Mobile
@@ -183,6 +183,7 @@ Cadastrar Anexo
     ${btnCamera}             Set Variable     android=UiSelector().resourceId("com.android.camera2:id/shutter_button")
     ${btnDone}               Set Variable     android=UiSelector().resourceId("com.android.camera2:id/done_button")
     
+    Wait Until Element Is Visible    ${btnAnexo}
     Click Element    ${btnAnexo}
     Wait Until Page Contains    Listagem de Anexo
     
@@ -202,13 +203,10 @@ Cadastrar Anexo
     Wait Until Element Is Visible    ${btnDone}
     Click Element    ${btnDone}
 
-    Wait Until Element Is Visible    ${btnSalvar}
-    Click Element    ${btnSalvar}
+    Click Salvar
     
     
-    ${btnVoltar}    Set Variable    android=UiSelector().description("Navigate up")
-    Wait Until Element Is Visible    ${btnVoltar}
-    Click Element    ${btnVoltar}
+    Click Salvar
     
 
     Wait Until Page Contains    O.S.
@@ -257,11 +255,21 @@ Cadastro Registro Funcionario
     ${btnOK}                Set Variable    android=UiSelector().text("OK")
     ${btnCancel}            Set Variable    android=UiSelector().text("Cancelar")
     ${btnSim}               Set Variable    android=UiSelector().resourceId("android:id/button1")
-    
+    ${primeiroRegistro}     Set Variable    android=UiSelector().className("android.view.ViewGroup").instance(14)
+
     
     Click Element    ${btnFuncionario}
     Wait Until Element Is Visible    ${btnNewFuncionario}
     
+    Click Element    ${primeiroRegistro}
+    Wait Until Element Is Visible    ${menuOptions}
+    
+    Menu Options    Excluir
+    Wait Until Page Contains    Confirma a exclusão desse registro?
+    
+    Click Element    ${btnSim}
+    Wait Until Element Is Visible    ${btnNewFuncionario}
+
     Click Element    ${btnNewFuncionario}
     Wait Until Element Is Visible    ${sFuncionario}
 
@@ -281,16 +289,62 @@ Cadastro Registro Funcionario
 
 
     Click Element    android=UiSelector().description("Navigate up")
-    Wait Until Page Contains    Registros de Funcionários
-
+    
       
     Run Keyword And Ignore Error    Wait Until Element Is Visible    ${btnSim}
     Run Keyword And Ignore Error    Click Element    ${btnSim}
 
+    Wait Until Page Contains    Registros de Funcionários
+
     Click Element    android=UiSelector().description("Navigate up")
     Wait Until Page Contains    O.S.
 
+Cadastro Registro Servico
+    [Tags]    Cadastro    OS    Registro Servico
 
+    ${btnServico}          Set Variable    android=UiSelector().className("android.view.ViewGroup").instance(39)
+    ${btnNewServico}       Set Variable    android=UiSelector().className("android.widget.Button").instance(3)
+    ${campoDescricao}      Set Variable    android=UiSelector().className("android.widget.EditText").instance(0)
+    ${btnSim}              Set Variable    android=UiSelector().resourceId("android:id/button1")
+    
+    Click Element    ${btnServico}
+    Wait Until Element Is Visible    ${btnNewServico}
+
+    Click Element    ${btnNewServico}
+    Wait Until Element Is Visible    ${campoDescricao}
+
+    Input Text    ${campoDescricao}    Descrição Automatizada
+    Click Salvar
+    Wait Until Page Contains    Registros de Serviço
+    
+    Click Salvar
+    Wait Until Page Contains    O.S.
+
+
+Fechar O.S.
+    [Tags]    OS    Fechamento
+    ${btnSim}            Set Variable    android=UiSelector().resourceId("android:id/button1")
+    ${msgExportar}       Set Variable    //android.widget.TextView[@text="Há dados de O.S.'s a exportar. Toque aqui para exportar."]
+    ${btnOK}             Set Variable    android=UiSelector().resourceId("android:id/button2")
+    
+    Menu Options    Fechar O.S.
+
+    Run Keyword And Ignore Error    Wait Until Page Contains    Há registros de funcionários previstos! Confirma o fechamento desta OS?    30
+    Run Keyword And Ignore Error    Click Element    ${btnSim}
+    
+    Wait Until Page Contains    Confirma o fechamento desta OS?
+    Click Element    ${btnSim}
+    Wait Until Page Contains    Lista de O.S.'s
+
+    Click Salvar
+    Wait Until Element Is Visible  ${msgExportar}
+    Click Element    ${msgExportar}  
+    
+    Wait Until Page Contains    Exportando tabelas    15
+    Wait Until Page Contains    Processo concluído com sucesso!    30
+
+    Click Element    ${btnOK}
+    Sleep    20
 
 *** Keywords ***
 
@@ -301,7 +355,7 @@ Click Salvar
     
     Wait Until Element Is Visible    ${saveButton}    20
     Click Element    ${saveButton}
-    Wait Until Page Contains      Configurações
+    Sleep    1
 
 
 Menu Superior
@@ -328,11 +382,8 @@ Campo Pesquisa
 
     Click Element    ${locator}
     Wait Until Page Contains    Pesquisa
-    Sleep    1
     Click Element    //android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[2]/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.widget.ImageView[1]
-    
     Sleep    1
-    
     Run Keyword And Continue On Failure    
     ...    Click Element    //androidx.recyclerview.widget.RecyclerView/android.view.ViewGroup[${elementPosition}]/android.view.ViewGroup
 
