@@ -16,13 +16,13 @@ ${btnVoltar}       android=UiSelector().description("Navigate up")
 ${btnSalvar}       android=UiSelector().description("Navigate up")
 ${message}         //android.widget.TextView[@resource-id="android:id/message"]
 ${appPackage}      com.engemanmaui.portocel
-
+${gerarBanco}      ${False}
 
 *** Test Cases ***
 
 Abrir Tela Principal
 
-    Iniciar Sessão    Portocel    C:\\QAx\\projects\\Maui\\com.engemanmaui.portocel.apk    false
+    Iniciar Sessão    Portocel    C:\\QAx\\projects\\Maui\\com.engemanmaui.portocel.apk    true
 
 
 Digitar Webservice
@@ -32,7 +32,9 @@ Digitar Webservice
     ${lastField}    Set Variable     //android.widget.EditText[@text="Escolher"]
     ${check1}       Set Variable     //androidx.drawerlayout.widget.DrawerLayout/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[2]/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[6]/android.widget.Switch
     ${check2}       Set Variable     //androidx.drawerlayout.widget.DrawerLayout/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[2]/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[7]/android.widget.Switch
-
+    IF    ${gerarBanco} == False
+        Pass Execution    Banco já configurado!
+    END
     Wait Until Element Is Visible    ${cfgButton}    20
     Click Element    ${cfgButton}
     
@@ -45,8 +47,12 @@ Digitar Webservice
 
 Gerar Banco de Dados
     [Tags]    Geracao Banco
+    
     ${btnNao}    Set Variable    //android.widget.Button[@resource-id="android:id/button2"]
     
+    IF    ${gerarBanco} == False
+        Pass Execution    Banco já configurado!
+    END
     
     Wait Until Page Contains    Importar Dados
     Click Text    Importar Dados
@@ -73,13 +79,15 @@ Gerar Banco de Dados
 
 Logar no app
     [Tags]    Login
-    ${loginField}      Set Variable    //android.widget.EditText[@text="Usuário"]
-    ${passField}       Set Variable    //android.widget.EditText[@text="Senha"]
+    ${loginField}      Set Variable    android=UiSelector().className("android.widget.EditText").instance(0)
+    ${passField}       Set Variable    android=UiSelector().className("android.widget.EditText").instance(0)
     ${buttonEntrar}    Set Variable    //android.widget.TextView[@text="Entrar"]
     
     Wait Until Element Is Visible    ${loginField}    30
-    Input Text    ${loginField}    engeman
-    Input Password    ${passField}    engeman
+    Clear Text        ${loginField}
+    Input Text        ${loginField}    engeman
+    Clear Text        ${passField}
+    Input Password    ${passField}     engeman
     
     Click Element    ${buttonEntrar}
 
@@ -88,7 +96,44 @@ Logar no app
     Click Text   01
     Wait Until Page Contains    Notificações    10
 
+Cadastro Coleta Acumulativa
+    ${btnNew}    Set Variable    android=UiSelector().className("android.widget.Button")
     
+    Remover Notificação
+    Menu Superior    Coletas
+    Wait Until Page Contains    Coleta Acumulativa
+    
+    Click Text       Coleta Acumulativa
+    Wait Until Page Contains    Pesquisa - Aplicação - Coleta Acumulativa
+    
+    Click Element    android=UiSelector().className("android.view.ViewGroup").instance(15)
+    Wait Until Element Is Visible    ${btnNew}
+    Click Element    ${btnNew}
+    Wait Until Page Contains    Última Leitura:
+
+    Coleta Acumulativa    2
+
+    Navegar Menu Principal
+
+Cadastro Coleta Tendência
+    ${btnNew}    Set Variable    android=UiSelector().className("android.widget.Button")
+    
+    
+    Menu Superior    Coletas
+    Wait Until Page Contains    Coleta de Tendência
+    
+    Click Text       Coleta de Tendência
+    Wait Until Page Contains    Pesquisa - Aplicação - Coleta Tendência
+    
+    Click Element    android=UiSelector().className("android.view.ViewGroup").instance(15)
+    Wait Until Element Is Visible    ${btnNew}
+    Click Element    ${btnNew}
+    Wait Until Page Contains    Última Leitura:
+
+    Coleta Tendencia    2.5
+
+    Navegar Menu Principal
+
 Cadastro OS Local
     [Tags]    Cadastro    OS
     
@@ -107,8 +152,7 @@ Cadastro OS Local
     ${btnSim}              Set Variable    //android.widget.Button[@resource-id="android:id/button1"]
     ${newOSButton}         Set Variable    //android.widget.Button
     
-    
-    
+        
     Menu Superior    Ordem de Serviço
     Wait Until Page Contains    O.S. Mobile
 
