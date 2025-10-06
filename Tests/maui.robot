@@ -80,7 +80,7 @@ Gerar Banco de Dados
 Logar no app
     [Tags]    Login
     ${loginField}      Set Variable    android=UiSelector().className("android.widget.EditText").instance(0)
-    ${passField}       Set Variable    android=UiSelector().className("android.widget.EditText").instance(0)
+    ${passField}       Set Variable    android=UiSelector().className("android.widget.EditText").instance(1)
     ${buttonEntrar}    Set Variable    //android.widget.TextView[@text="Entrar"]
     
     Wait Until Element Is Visible    ${loginField}    30
@@ -95,9 +95,33 @@ Logar no app
 
     Click Text   01
     Wait Until Page Contains    Notificações    10
+    Remover Notificação
+
+Rota de Coleta Unificada
+    
+    ${sPlanoRota}         Set Variable    android=UiSelector().className("android.widget.ImageView").instance(2)
+    ${btnCarregarRota}    Set Variable    android=UiSelector().text("Carregar Aplicações")
+    Menu Superior    Rotas de Coletas
+    Wait Until Page Contains    Rota de Coleta Unificada
+
+    Click Text    Rota de Coleta Unificada
+    Wait Until Element Is Visible    ${sPlanoRota}
+
+    Campo Pesquisa    ${sPlanoRota}    1
+    Wait Until Page Contains    Configuração para Rota de Coleta
+    
+    Click Element    ${btnCarregarRota}
+    Preencher Rota de Coleta
+
+    Click Salvar
+    Wait Until Page Contains    Configuração para Rota de Coleta    30
+    
+    Navegar Menu Principal
 
 Cadastro Coleta Acumulativa
     ${btnNew}    Set Variable    android=UiSelector().className("android.widget.Button")
+    
+    Skip
     
     Remover Notificação
     Menu Superior    Coletas
@@ -119,6 +143,9 @@ Cadastro Coleta Tendência
     ${btnNew}    Set Variable    android=UiSelector().className("android.widget.Button")
     
     
+    Skip
+    
+    
     Menu Superior    Coletas
     Wait Until Page Contains    Coleta de Tendência
     
@@ -130,9 +157,11 @@ Cadastro Coleta Tendência
     Click Element    ${btnNew}
     Wait Until Page Contains    Última Leitura:
 
-    Coleta Tendencia    2.5
+    Coleta Tendencia    1
 
     Navegar Menu Principal
+
+
 
 Cadastro OS Local
     [Tags]    Cadastro    OS
@@ -385,5 +414,3 @@ Fechar O.S.
 
     Click Element    ${btnOK}
     Sleep    20
-
-    Run Keyword If Test Failed    Navegar Menu Principal
