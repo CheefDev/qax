@@ -29,7 +29,7 @@ Iniciar Sessão
     ...            autoGrantPermissions=true
     ...            noReset=${noReset}
     ...            autoDismissAlerts=true
-
+    #...            enforce_xpath1=True
 Click Salvar
 
     ${saveButton}    Set Variable    android=UiSelector().description("Navigate up")
@@ -218,3 +218,81 @@ Coleta Tendencia
 Remover Notificação
     
     Swipe    ${246}    ${280}    ${810}    ${280}    200
+
+Preencher Rota de Coleta
+    
+    ${labelSuperior}    Set Variable             android=UiSelector().textContains("Rota de Coleta").instance(0)
+    Wait Until Element Is Visible        ${labelSuperior}
+    ${labelText}        Get Element Attribute    ${labelSuperior}    text
+
+    ${parts}            Split String             ${labelText}
+    
+    ${regCount}         Set Variable    ${parts}[6]
+    ${coletas}          Set Variable    0
+
+
+    Log To Console    \nNúmero de Registros na Rota: ${regCount}\n    
+    WHILE    ${coletas} < ${regCount}
+        
+        ${camposNaTela}    Get Matching Xpath Count       xpath=(//android.widget.TextView[contains(@text,"Valor")])
+        Log To Console    \nCampos na Tela: ${camposNaTela}\n
+        
+        FOR    ${i}    IN RANGE    1    ${camposNaTela}+1
+                
+                ${item}    Set Variable         xpath=(//android.widget.TextView[contains(@text,"Valor")])[${i}]
+                
+                
+                ${is_visible}=    Run Keyword And Return Status    Element Should Be Visible    ${item}
+                
+                IF    $is_visible == False
+                    Swipe    ${450}    ${2000}    ${450}    ${1750}    1000
+                    Sleep    0.5
+                    ${is_visible}=    Run Keyword And Return Status    Element Should Be Visible    ${item}
+                END
+                
+                
+                ${bounds}    Get Element Attribute    ${item}     bounds
+                ${campo}    Set Variable        ${item}/following-sibling::android.widget.EditText[1]
+                #${textValor}    Set Variable    ${item}/following-sibling::android.widget.TextView[3]
+                ${iText}          Get Element Attribute    ${item}    text
+                Log To Console    \n${iText}\n
+                #Log To Console    ${bounds}
+                ${is_visible}=    Run Keyword And Return Status    Element Should Be Visible    ${campo}
+                
+                IF    $is_visible == False
+                    Swipe    ${450}    ${2000}    ${450}    ${1750}    1000
+                    Sleep    0.5
+                    ${is_visible}=    Run Keyword And Return Status    Element Should Be Visible    ${item}
+                END
+                ${textoCampo}    Get Element Attribute    ${campo}    text
+                
+                IF    $textoCampo == ""
+                    ${parts}               Split String             ${iText}
+                    ${valor}               Set Variable             ${parts}[3]
+                    ${valor}               Remove String            ${valor}    )
+                    ${valor}               Replace String           ${valor}    ,    ${SPACE}
+                        
+                    ${partsValor}          Split String    ${valor}
+                    ${valor}    Set Variable    ${partsValor}[0]
+                    #Log To Console    \n${valor}\n
+                        
+                    ${newValor}    Evaluate    ${valor} + 1
+                    Click Element    ${campo}
+                    Input Text    ${campo}    ${newValor}
+
+                    #Log To Console    \n${newValor}\n
+                    ${coletas}    Evaluate    ${coletas} + 1
+                    Log To Console    ${valor} -> ${newValor}
+                    Log To Console    \nColetas: ${coletas}\n
+                END
+                
+                
+            
+        END
+        Swipe    ${450}    ${2000}    ${450}    ${1200}    1000
+        Sleep    1
+    END
+    
+Descartar Alterações
+    
+    Menu Options    Descartar Alterações
