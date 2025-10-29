@@ -8,21 +8,75 @@ Library    Collections
 *** Variables ***
 
 ${appName}         Maui
-${webservice}      10.12.1.5/ws${appName}  
+${webservice}      wshml.engeman.com/ws${appName}  
 ${saveButton}      //android.widget.ImageButton[@content-desc="Navigate up"] 
 
 ${menuSuperior}    //android.widget.ImageButton[@content-desc="Open navigation drawer"]
 ${menuOptions}     //android.widget.ImageView[@content-desc="More options"]
-${btnVoltar}       UiSelector().className("android.widget.ImageView").instance(0)
-${btnSalvar}       UiSelector().className("android.widget.ImageView").instance(0)
+${btnVoltar}       android=UiSelector().description("Navigate up")
+${btnSalvar}       android=UiSelector().description("Navigate up")
 ${message}         //android.widget.TextView[@resource-id="android:id/message"]
 ${appPackage}      com.engemanmaui.padrao
-${deviceName}      emulator-5554
+${deviceName}      21151FDF60007B
 
 #Modo USB
-${usbMode}         False
+${usbMode}         True
 
 
+#Configurações Gerais
+#N - Nada
+#B - Bloquear
+#A - Avisar
+
+#Config Gerais -> Geral -> Ordem De Serviço -> Segurança
+${cfgMaterialNaoRelacionadoAplic}     N
+${cfgFuncOutroSetor}                  B
+${cfgFuncOutraFilial}                 B
+${cfgFuncNaoQualificado}              B
+${cfgFuncOutroCargo}                  B
+${cfgFuncForaDaEscala}                B
+${cfgAgrupamentoDivergAplic}          B
+${cfgFuncAntesDataProg}               A    
+${cfgAplicJaPossuiOS}                 N
+${cfgAplicNaGarantia}                 A
+${cfgAtDataManutencao}                N
+${cfgPlanoNaoRelacAplicCont}          N
+${cfgFuncQualifVencida}               A
+${cfgFuncAntDataProg}                 A
+${cfgPlanejHrsSuperiorAPrev}          N
+${cfgPlanejHrsInferiorAPrev}          N
+${cfgLimiteAlocacaoMaoDeObra}         11
+${cfgDataParouInferorDataProg}        A
+${cfgFechVerifAplicParouFuncionou}    N
+${cfgFechOSReqPendente}               N
+${cfgRegMatSMapeamento}               A
+${cfgExigeMotLib}                     S
+${cfgPerAvalOSdeSS}                   S
+${cfgFecharServNExec}                 A
+${cfgFecMatSemQuant}                  A
+${cfgFecMatAdSemQuant}                A
+${cfgFecMatSemAlm}                    A
+
+#Configurações Gerais -> Dispositivos Móveis -> Segurança
+
+${cfmMultiEmp}                True
+${cfmUserNaAssinatura}        True
+${cfmImportaAnexos}           True
+
+#As Duas são a mesma configuração, porém há opção para bloquear só ao fechar ou liberar.
+${cfmFecharSemDataTermino}     B
+${cfmLiberarSemDataTermino}    N
+
+
+${cfmFecharOSSemMidia}         B
+${cfmLiberarOSSemMidia}        B
+${cfgFechFuncPrev}             A
+#Config Limite de Variação Mobile
+
+${cfmLimiteAcumulativa}       10
+${cfmLimiteTendencia}         10
+
+${cfmImportObsPlano}          True
 
 
 *** Keywords ***
@@ -48,8 +102,7 @@ Iniciar Sessão
 
 Click Salvar
 
-    #${saveButton}    Set Variable    android=UiSelector().description("Navigate up")
-    ${saveButton}     Set Variable    android=new UiSelector().className("android.widget.ImageView").instance(0)
+    ${saveButton}    Set Variable    android=UiSelector().description("Navigate up")
     
     Wait Until Element Is Visible    ${saveButton}    20
     Click Element    ${saveButton}
@@ -80,9 +133,9 @@ Menu Options
 Campo Pesquisa
     [Arguments]    ${locator}    ${text}=1
     
-    ${primeiroItem}        Set Variable    android=UiSelector().className("android.view.ViewGroup").instance(20)
+    ${primeiroItem}        Set Variable    android=UiSelector().className("android.view.ViewGroup").instance(17)
     ${cFiltroPesquisa}     Set Variable    android=UiSelector().className("android.widget.EditText")
-    ${btnPesquisar}        Set Variable    android=UiSelector().className("android.widget.ImageView").instance(3)
+    ${btnPesquisar}        Set Variable    android=UiSelector().className("android.widget.ImageView").instance(2)
     
     
     Click Element    ${locator}
@@ -136,7 +189,7 @@ Navegar Menu Principal
     WHILE    ${continue} == True
         
         Click Salvar
-        Sleep    1
+
         ${status}=    Run Keyword And Return Status     Wait Until Element Is Visible   ${btnSalvar}
         
         IF    ${status} == False 
@@ -212,7 +265,7 @@ Campo Data
         END
         ${selectMinutes}    Set Variable    //android.widget.TextView[@resource-id="android:id/text1" and @text="${newMinutes}"]
        
-        Wait Until Page Contains Element    ${selectMinutes}
+        
         Click Element    ${selectMinutes}
         Sleep    1
     
@@ -501,8 +554,8 @@ Cadastro OS Basica
 
     Swipe    ${325}    ${1751}    ${325}    ${505}
 
-    ${searchTipoManut}    Set Variable    android=UiSelector().className("android.widget.ImageView").instance(10)
-    ${searchSetor}        Set Variable    android=UiSelector().className("android.widget.ImageView").instance(13)
+    ${searchTipoManut}    Set Variable    android=UiSelector().className("android.widget.ImageView").instance(9)
+    ${searchSetor}        Set Variable    android=UiSelector().className("android.widget.ImageView").instance(12)
 
     Campo Pesquisa    ${searchTipoManut}    1
     Wait Until Element Is Visible    ${searchSetor}
@@ -515,10 +568,8 @@ Cadastro OS Basica
     ${textoMsg}    Get Element Attribute    ${msg}    text
     ${parts}                   Split String             ${textoMsg}
     ${codigoOS}               Set Variable             ${parts}[4]
-    #Click Element    //android.widget.Button[@resource-id="android:id/button2"]
-    Mensagem   validada no servidor com sucesso!    Ok 
+    Click Element    android=UiSelector().resourceId("android:id/button2")
     Log To Console    \nOS Gerada: ${codigoOS}
-    
     Wait Until Page Contains    Solicitação de Serviço    20
     Click Salvar
 
@@ -547,12 +598,11 @@ Exportar Dados Pendentes
 Mensagem
     [Arguments]    ${text}    ${option}
 
-    ${visible}=    Run Keyword And Return Status    Wait Until Page Contains    ${text}    10
+    ${visible}=    Run Keyword And Return Status    Wait Until Page Contains    ${text}    2
+    ${mensagem}=    Get Element Attribute    android=UiSelector().resourceId("android:id/message")    text
     
     IF    ${visible}
         
-        ${mensagem}=    Get Element Attribute    android=UiSelector().resourceId("android:id/message")    text
-    
         ${button}    Set Variable    //android.widget.Button[@text="${option}"]
         Click Element    ${button}
         Log To Console    \n${mensagem} -> ${option}\n
@@ -591,8 +641,8 @@ Anexo Servico
     ${optAnexoSimples}       Set Variable     //android.widget.TextView[@resource-id="android:id/text1" and @text="Anexo"]
     ${optAnexoMultiplo}      Set Variable     //android.widget.TextView[@resource-id="android:id/text1" and @text="Anexos múltiplos"]
     ${btnSelecionarAnexo}    Set Variable     android=UiSelector().text("Selecionar Anexo")
-    ${btnCamera}             Set Variable     android=UiSelector().resourceId("com.android.camera2:id/shutter_button")
-    ${btnDone}               Set Variable     android=UiSelector().resourceId("com.android.camera2:id/done_button")
+    ${btnCamera}             Set Variable     //android.widget.ImageButton[@content-desc="Take photo"]
+    ${btnDone}               Set Variable     //android.widget.ImageButton[@content-desc="Done"]
     
     Menu Options    Anexo
     Wait Until Page Contains    Listagem de Anexo
@@ -654,49 +704,3 @@ Inserir Texto
 
     END
     
-Voltar Para
-    [Arguments]    ${text}
-
-   ${textoTela}    Run Keyword And Return Status    Page Should Contain Text    ${text}
-   ${COUNT}        Set Variable    0
-
-    WHILE    ${textoTela} == False
-            Mensagem Erro
-            Click Salvar
-            Sleep    1
-            ${textoTela}=    Run Keyword And Return Status    Page Should Contain Text    ${text}
-            ${COUNT}    Evaluate    ${COUNT} + 1
-            
-            IF    ${COUNT} >= 10
-                ${textoTela}    Set Variable    True
-            END
-
-        
-    END
-
-Mensagem Erro
-    
-    ${msgLocator}    Set Variable    android=UiSelector().resourceId("android:id/message")
-    ${mensagemVisivel}=    Run Keyword And Return Status    Page Should Contain Element    ${msgLocator}
-    
-    WHILE    ${mensagemVisivel} == True
-        
-        ${descartar}=    Run Keyword And Return Status    Page Should Contain Element     android=UiSelector().text("Ok")
-        
-        IF   ${descartar} == True
-            
-            Run Keyword And Ignore Error    Click Text    Ok
-            Run Keyword And Ignore Error    Menu Options    Descartar
-        
-        ELSE
-            
-            Click Element    android=UiSelector().text("Sim")
-
-        END
-        
-        Sleep    1
-        ${mensagemVisivel}=    Run Keyword And Return Status    Page Should Contain Element    ${msgLocator}
-
-    END
-
-     
