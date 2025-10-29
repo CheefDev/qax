@@ -29,3 +29,4 @@ Logar no app
     Click Text   01
     Wait Until Page Contains    Início    10
     Remover Notificação
+

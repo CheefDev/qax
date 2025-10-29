@@ -90,3 +90,26 @@ Exportar Dados
     
     Sleep    1
     Page Should Not Contain Text    Há dados de O.S.'s a exportar. Toque aqui para exportar.
+
+Importar O.S.s
+    
+   
+    ${btnNotificacoes}    Set Variable    android=UiSelector().className("android.widget.FrameLayout").instance(10)
+    ${btnInicio}          Set Variable    android=UiSelector().className("android.widget.FrameLayout").instance(9)
+
+    Click Element     ${btnNotificacoes}
+    
+
+    ${temOS}=     Run Keyword And Return Status    Page Should Contain Text    O.S. a importar 
+    
+    IF    ${temOS} == True
+        
+        Click Text    O.S. a importar 
+        Wait Until Page Contains    Atenção    120
+        Mensagem    Nova(s) O.S.s importada(s)    Ok
+
+    ELSE
+        Log    Sem O.S.s para importar!
+    END
+    
+    Click Element    ${btnInicio}

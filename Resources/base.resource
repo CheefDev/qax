@@ -7,8 +7,8 @@ Library    Collections
 
 *** Variables ***
 
-${appName}         Maui
-${webservice}      10.12.1.5/ws${appName}  
+${appName}         padrao
+${webservice}      10.12.1.5/wsmaui  
 ${saveButton}      //android.widget.ImageButton[@content-desc="Navigate up"] 
 
 ${menuSuperior}    //android.widget.ImageButton[@content-desc="Open navigation drawer"]
@@ -16,7 +16,7 @@ ${menuOptions}     //android.widget.ImageView[@content-desc="More options"]
 ${btnVoltar}       UiSelector().className("android.widget.ImageView").instance(0)
 ${btnSalvar}       UiSelector().className("android.widget.ImageView").instance(0)
 ${message}         //android.widget.TextView[@resource-id="android:id/message"]
-${appPackage}      com.engemanmaui.padrao
+${appPackage}      com.engemanmaui.${appName}
 ${deviceName}      emulator-5554
 
 #Modo USB
@@ -547,7 +547,7 @@ Exportar Dados Pendentes
 Mensagem
     [Arguments]    ${text}    ${option}
 
-    ${visible}=    Run Keyword And Return Status    Wait Until Page Contains    ${text}    10
+    ${visible}=    Run Keyword And Return Status    Wait Until Page Contains    ${text}    3
     
     IF    ${visible}
         
