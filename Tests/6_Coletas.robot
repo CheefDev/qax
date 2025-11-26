@@ -4,8 +4,7 @@ Library    AppiumLibrary
 Library    Process
 
 Resource    ../Resources/base.resource
-Resource    ../Resources/cfgMobile.resource
-Resource    ../Resources/cfgGeral.resource
+
 
 *** Variables ***
 
@@ -19,12 +18,19 @@ ${idMobile}        TESTEAUTOMATIZADO
 Rota de Coleta Unificada
     [Tags]    Cadastro    Coleta    Rota
     
+    @{permissao}    Create List    ${cfgmColTen}    
+    ${acesso}    Permissao Acesso Mobile    @{permissao}
+    
+    @{permissao}    Create List    ${cfgmColAcu}
+    ${acesso2}    Permissao Acesso Mobile    @{permissao}
+
     ${sPlanoRota}         Set Variable    android=UiSelector().className("android.widget.ImageView").instance(3)
     ${btnCarregarRota}    Set Variable    android=UiSelector().text("Carregar Aplicações")
     
+    
     Voltar Para    Início
     
-    Menu Superior    Rotas de Coletas
+    Menu Superior    Rotas
     Wait Until Page Contains    Rota de Coleta Unificada
 
     Click Text    Rota de Coleta Unificada
@@ -46,6 +52,9 @@ Cadastro Coleta Acumulativa
     [Tags]    Cadastro    Coleta
     ${btnNew}    Set Variable    android=UiSelector().className("android.widget.Button")
     
+
+    @{permissao}    Create List    ${cfgmColAcu}
+    ${acesso}    Permissao Acesso Mobile    @{permissao}
     Skip
     
     Remover Notificação
@@ -68,6 +77,8 @@ Cadastro Coleta Tendência
     [Tags]    Cadastro    Coleta
     ${btnNew}    Set Variable    android=UiSelector().className("android.widget.Button")
     
+    @{permissao}    Create List    ${cfgmColTen}
+    ${acesso}    Permissao Acesso Mobile    @{permissao}
     
     Skip
     

@@ -4,14 +4,17 @@ Library    AppiumLibrary
 Library    Process
 
 Resource    ../Resources/base.resource
-Resource    ../Resources/cfgMobile.resource
-Resource    ../Resources/cfgGeral.resource
+
 
 
 *** Test Cases ***
 
 Cadastro OS Local
     [Tags]    Cadastro    OS
+    
+    @{permissoes}    Create List    ${cfgmAbrirOS}    ${cfgmOrdServ}
+
+    ${acesso}    Permissao Acesso Mobile   @{permissoes}
     
     ${sResponsavel}        Set Variable    android=UiSelector().className("android.widget.ImageView").instance(5)
     ${sSolicitante}        Set Variable    android=UiSelector().className("android.widget.ImageView").instance(8)
@@ -27,6 +30,8 @@ Cadastro OS Local
     ${btnOk}               Set Variable    //android.widget.Button[@resource-id="android:id/button2"]
     ${btnSim}              Set Variable    //android.widget.Button[@resource-id="android:id/button1"]
     ${newOSButton}         Set Variable    //android.widget.Button
+
+    ${flagRegSalvo}        Set Variable    ${False}
     
     Voltar Para    Início
     Sleep    1
@@ -36,15 +41,34 @@ Cadastro OS Local
     Sleep    1
     Remover Notificação    
     
-    Menu Superior    Ordem de Serviço
+    ${menuSuperior}    Set Variable    //android.widget.ImageButton[@content-desc="Open navigation drawer"]
+    Wait Until Page Contains Element    ${menuSuperior}
+    Click Element    ${menuSuperior}
+
+    IF    ${cfgmOrdServ} == False
+        
+        Page Should Not Contain Text    Ordem de Serviço
+        
+        Pass Execution    Dispositivo sem permissão para acessar O.S.!
+        
+    END
+    
+    Wait Until Page Contains    Ordem de Serviço
+    Click Text   Ordem de Serviço
     Wait Until Page Contains    O.S. Mobile
 
     Click Text    O.S. Mobile
     Wait Until Page Contains    Lista de O.S.
-
-    
     
     Click Element    ${newOSButton}
+
+    IF    ${cfgmAbrirOS} == False
+        
+        Mensagem  Essa funcionalidade encontra-se bloqueada    Ok  
+        Skip    Dispositivo não tem permissão para abrir O.S.
+    END
+    
+    
     Wait Until Page Contains    Cadastro da O.S.
 
     Campo Pesquisa    ${sResponsavel}
@@ -74,6 +98,22 @@ Cadastro OS Local
     Wait Until Page Contains    Cadastro da O.S.
     
     Click Salvar
+
+    IF    ${flagRegSalvo} == ${False}
+        
+        IF    "${cfgAplicJaPossuiSS}" == "A"
+            Mensagem    As seguintes    Sim
+            ${flagRegSalvo}    Set Variable    ${True}
+            ELSE IF   "${cfgAplicJaPossuiSS}" == "B" 
+                
+                Mensagem    As seguintes    OK
+                Menu Options    Descartar Alterações
+            ELSE IF    "${cfgAplicJaPossuiSS}" == "N"
+                ${flagRegSalvo}    Set Variable    ${True}
+        END
+
+    END
+
     Wait Until Page Contains    Salvando registro
 
     ${msg}    Set Variable    android=UiSelector().resourceId("android:id/message")
@@ -103,7 +143,17 @@ Cadastro OS Local
     
 Encerramento    
     [Tags]    Cadastro    OS    Encerramento
+    
     Skip
+    
+    @{permissao}    Create List    ${cfgmPerEncerra}    ${cfgmOrdServ}
+    ${acesso}    Permissao Acesso Mobile    @{permissao}
+    
+    IF    ${acesso} == False
+        Skip
+    END
+
+
     ${aplParou}              Set Variable    android=UiSelector().className("android.widget.ImageView").instance(3)
     ${aplFuncionou}          Set Variable    android=UiSelector().className("android.widget.ImageView").instance(5)
     ${dataRecebimento}       Set Variable    android=UiSelector().className("android.widget.ImageView").instance(7)
@@ -139,15 +189,23 @@ Encerramento
 Cadastrar Anexo
     [Tags]    Cadastro    OS    Anexo
     
+    
+    
+    
+    @{permissao}    Create List    ${cfgmAbrirOS}    ${cfgmOrdServ}
+    ${acesso}    Permissao Acesso Mobile    @{permissao}
+
+    IF    ${acesso} == False
+        Skip
+    END
+
     ${btnAnexo}              Set Variable     android=UiSelector().text("Anexos")
     ${newAnexoButton}        Set Variable     //android.widget.Button
     ${optAnexoSimples}       Set Variable     //android.widget.TextView[@resource-id="android:id/text1" and @text="Anexo"]
     ${optAnexoMultiplo}      Set Variable     //android.widget.TextView[@resource-id="android:id/text1" and @text="Anexos múltiplos"]
     ${btnSelecionarAnexo}    Set Variable     android=UiSelector().text("Selecionar Anexo")
-    ${btnCamera}             Set Variable     android=UiSelector().resourceId("com.android.camera2:id/shutter_button")
-    ${btnCameraUSB}          Set Variable     //android.widget.ImageButton[@content-desc="Take photo"]
-    ${btnDone}               Set Variable     android=UiSelector().resourceId("com.android.camera2:id/done_button")
-    ${btnDoneUSB}            Set Variable     //android.widget.ImageButton[@content-desc="Done"]
+    
+    
     
     Wait Until Element Is Visible    ${btnAnexo}
     Click Element    ${btnAnexo}
@@ -163,11 +221,7 @@ Cadastrar Anexo
     Wait Until Element Is Visible    android=UiSelector().resourceId("${appPackage}:id/parentPanel")
     Click Element    android=UiSelector().text("Câmera")
 
-    Wait Until Element Is Visible    ${btnCamera}
-    Click Element    ${btnCamera}
-
-    Wait Until Element Is Visible    ${btnDoneUSB}
-    Click Element    ${btnDoneUSB}
+    Tirar Foto
 
     Click Salvar
     Wait Until Page Contains    Listagem
@@ -178,6 +232,12 @@ Cadastrar Anexo
 Cadastrar Assinatura
     [Tags]    Cadastro    OS    Assinatura
     
+    @{permissao}    Create List    ${cfgmAbrirOS}    ${cfgmOrdServ}
+    ${acesso}    Permissao Acesso Mobile    @{permissao}
+    IF    ${acesso} == False
+        Skip
+    END
+
     ${btnAssinatura}         Set Variable     android=UiSelector().text("Assinatura")
     ${btnNovaAssinatura}     Set Variable     android=UiSelector().className("android.widget.Button")
     ${campoDescricao}        Set Variable     android=UiSelector().className("android.widget.EditText").instance(0)
@@ -207,6 +267,12 @@ Cadastrar Assinatura
 Cadastro Registro Funcionario
     [Tags]    Cadastro    OS    Funcionario
     
+    @{permissao}    Create List    ${cfgmAbrirOS}    ${cfgmPerFunc}    ${cfgmOrdServ}
+    ${acesso}    Permissao Acesso Mobile    @{permissao}
+    IF    ${acesso} == False
+        Skip
+    END
+
     ${btnFuncionario}       Set Variable    android=UiSelector().text("Funcionários")
     ${btnNewFuncionario}    Set Variable    android=UiSelector().className("android.widget.Button")
     ${sFuncionario}         Set Variable    android=UiSelector().className("android.widget.ImageView").instance(3)
@@ -276,6 +342,12 @@ Cadastro Registro Funcionario
 Cadastro Requisição
     [Tags]    Cadastro    Requisição    OS
     
+    @{permissao}    Create List    ${cfgmAbrirOS}    ${cfgmRequis}    ${cfgmOrdServ}
+    ${acesso}    Permissao Acesso Mobile    @{permissao}
+    IF    ${acesso} == False
+        Skip
+    END
+
     #Swipe para o botão aparecer na tela
     Swipe    ${479}    ${1345}    ${479}    ${1076}
     Skip
@@ -342,6 +414,12 @@ Cadastro Requisição
 Cadastro Registro Servico
     [Tags]    Cadastro    OS    Registro Servico
     
+    @{permissao}    Create List    ${cfgmOrdServ}    ${cfgmAbrirOS}    ${cfgmPerServico}
+    ${acesso}    Permissao Acesso Mobile    @{permissao}
+    IF    ${acesso} == False
+        Skip
+    END
+
     ${btnServico}          Set Variable    android=UiSelector().text("Serviços")
     ${btnNewServico}       Set Variable    android=UiSelector().className("android.widget.Button").instance(3)
     ${campoDescricao}      Set Variable    android=UiSelector().className("android.widget.EditText").instance(0)
@@ -361,6 +439,13 @@ Cadastro Registro Servico
 
 Marcar Registros Serviço Como Executado
     [Tags]    Serviço    Anexo    Executado
+    
+    @{permissao}    Create List    ${cfgmOrdServ}    ${cfgmAbrirOS}    ${cfgmPerServico}
+    ${acesso}    Permissao Acesso Mobile    @{permissao}
+    
+    IF    ${acesso} == False
+        Skip
+    END
     
     Wait Until Page Contains    Registros de Serviços - reg(s)
 
@@ -442,6 +527,13 @@ Marcar Registros Serviço Como Executado
 
 Coleta Unificada
     [Tags]    OS    Coleta
+    
+    @{permissao}    Create List    ${cfgmOrdServ}    ${cfgmAbrirOS}    ${cfgmColAcu}    ${cfgmColTen}
+    ${acesso}    Permissao Acesso Mobile    @{permissao}
+    IF    ${acesso} == False
+        Skip
+    END
+
     Wait Until Page Contains     reg(s)
     Menu Options    Coleta Unificada
 
@@ -455,6 +547,12 @@ Coleta Unificada
 Interação
     [Tags]    OS    Interação    Cadastro
     
+    @{permissao}    Create List    ${cfgmOrdServ}    ${cfgmAbrirOS}
+    ${acesso}    Permissao Acesso Mobile    @{permissao}
+    IF    ${acesso} == False
+        Skip
+    END
+
     Swipe    ${391}    ${2178}    ${416}    ${394}
 
     Wait Until Page Contains    Interação
@@ -484,21 +582,22 @@ Interação
     Wait Until Element Is Visible    android=UiSelector().resourceId("${appPackage}:id/parentPanel")
     Click Element    android=UiSelector().text("Câmera")
     
-    ${btnCamera}             Set Variable     android=UiSelector().resourceId("com.android.camera2:id/shutter_button")
-    ${btnDone}               Set Variable     android=UiSelector().resourceId("com.android.camera2:id/done_button")
-
-    Wait Until Element Is Visible    ${btnCamera}
-    Click Element    ${btnCamera}
-
-    Wait Until Element Is Visible    ${btnDone}
-    Click Element    ${btnDone}
-    Wait Until Page Contains        Anexo
+    Tirar Foto
 
     
     Voltar Para      O.S. 
 
 Fechar O.S.
     [Tags]    OS    Fechamento
+    
+    @{permissao}    Create List    ${cfgmOrdServ}    ${cfgmPerFechaOS}
+    ${acesso}    Permissao Acesso Mobile    @{permissao}
+    
+    IF    ${acesso} == False
+        Skip
+    END
+    
+
     ${btnSim}            Set Variable    android=UiSelector().resourceId("android:id/button1")
     ${msgExportar}       Set Variable    //android.widget.TextView[@text="Há dados de O.S.'s a exportar. Toque aqui para exportar."]
     ${btnOK}             Set Variable    android=UiSelector().resourceId("android:id/button2")

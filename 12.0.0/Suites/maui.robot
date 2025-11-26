@@ -5,18 +5,10 @@ Library    Process
 
 Resource    ../Resources/base.resource
 
+
 *** Variables ***
 
-${appName}         Agrana
-${webservice}      wshml.engeman.com/wsmaui${appName}
-${saveButton}      //android.widget.ImageButton[@content-desc="Navigate up"] 
 
-#${menuSuperior}    //android.widget.ImageButton[@content-desc="Open navigation drawer"]
-#${menuOptions}     //android.widget.ImageView[@content-desc="More options"]
-${btnVoltar}       android=UiSelector().description("Navigate up")
-${btnSalvar}       android=UiSelector().description("Navigate up")
-${message}         //android.widget.TextView[@resource-id="android:id/message"]
-${appPackage}      com.engemanmaui.${appName}
 ${gerarBanco}      ${null}
 ${idMobile}        TESTEAUTOMATIZADO
 
@@ -25,7 +17,7 @@ ${idMobile}        TESTEAUTOMATIZADO
 
 Abrir Tela Principal
     [Tags]    Sessao
-    Iniciar Sessão    ${appName}    C:\\QAx\\projects\\Maui\\${appPackage}.apk    true
+    Iniciar Sessão    ${appName}    C:\\QAx\\projects\\Maui\\12.0.0\\APK\\${appPackage}.apk    true
 
 
 Digitar Webservice
@@ -37,7 +29,7 @@ Digitar Webservice
     ${check2}       Set Variable     //androidx.drawerlayout.widget.DrawerLayout/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[2]/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[7]/android.widget.Switch
     
     Wait Until Page Contains    Build    10
-    ${gerarBanco}    Run Keyword And Return Status    Page Should Not Contain Text  Login do Sistema
+    ${gerarBanco}=    Run Keyword And Return Status    Page Should Not Contain Text  Login do Sistema
     
     
     IF    ${gerarBanco} == False
@@ -68,6 +60,14 @@ ID Mobile
     END
     
     ${cIdMobile}    Set Variable    android=UiSelector().className("android.widget.EditText").instance(2)
+
+    ${visible}=    Run Keyword And Return Status    Page Should Contain Element    ${cIdMobile}
+
+    IF     ${visible} == False
+        Pass Execution    Banco já configurado!
+    END
+
+    
     Click Element    ${cIdMobile}
     Clear Text       ${cIdMobile}
     Input Text       ${cIdMobile}    ${idMobile}
@@ -99,12 +99,21 @@ Gerar Banco de Dados
     Menu Options    Marcar Todas
     Sleep    1
     Menu Options    Continuar
+    
+    Sleep    10
+    ${limiteOS}=    Run Keyword And Return Status    Page Should Contain Text    a consulta de O.S.'s
 
-    Wait Until Page Contains    Prosseguir sem importar O.S.    60
-    Click Text    Prosseguir sem importar O.S.
-
-    Wait Until Page Contains    Banco de dados gerado e baixado com sucesso!    120
-    Click Text    Ok
+    IF    ${limiteOS} == False
+        
+        Wait Until Page Contains    Prosseguir sem importar O.S.    60
+        Click Text    Prosseguir sem importar O.S.
+        ELSE
+            Click Text    OK
+    END
+    
+    
+    Wait Until Page Contains    Banco de dados gerado e baixado com sucesso!    60
+    Mensagem    Banco de dados gerado e baixado com sucesso!    Ok
 
     Sleep    2
 
@@ -129,6 +138,7 @@ Logar no app
 
     Click Text   01
     Wait Until Page Contains    Notificações    10
+    Start Screen Recording
     Remover Notificação
 
 Rota de Coleta Unificada
@@ -219,6 +229,7 @@ Cadastro OS Local
     ${btnSim}              Set Variable    //android.widget.Button[@resource-id="android:id/button1"]
     ${newOSButton}         Set Variable    //android.widget.Button
     
+    ${flagRegSalvo}        Set Variable    ${False}
         
     Menu Superior    Ordem de Serviço
     Wait Until Page Contains    O.S. Mobile
@@ -257,7 +268,23 @@ Cadastro OS Local
     Campo Pesquisa    ${sCentroCusto}
     Wait Until Page Contains    Cadastro da O.S.
     
-    Click Element    ${saveButton}
+    Click Salvar
+    Sleep    2
+    IF    ${flagRegSalvo} == ${False}
+        
+        IF    "${cfgAplicJaPossuiOS}" == "A"
+            Mensagem    Atenção   Sim
+            ${flagRegSalvo}    Set Variable    ${True}
+            ELSE IF   "${cfgAplicJaPossuiOS}" == "B" 
+                
+                Mensagem    Atenção   OK
+                Menu Options    Descartar Alterações
+            ELSE IF    "${cfgAplicJaPossuiOS}" == "N"
+                ${flagRegSalvo}    Set Variable    ${True}
+        END
+
+    END
+
     Wait Until Page Contains    Salvando registro
 
     ${msg}    Set Variable    android=UiSelector().resourceId("android:id/message")
@@ -348,11 +375,7 @@ Cadastrar Anexo
     Wait Until Element Is Visible    android=UiSelector().resourceId("${appPackage}:id/parentPanel")
     Click Element    android=UiSelector().text("Câmera")
 
-    Wait Until Element Is Visible    ${btnCameraUSB}
-    Click Element    ${btnCameraUSB}
-
-    Wait Until Element Is Visible    ${btnDoneUSB}
-    Click Element    ${btnDoneUSB}
+    Tirar Foto
 
     Click Salvar
     
@@ -740,6 +763,7 @@ Cadastro S.S.
     Wait Until Element Is Visible    ${newSsButton}
     Click Element    ${newSsButton}
     
+    ${flagRegSalvo}    Set Variable    ${False}
     Wait Until Element Is Visible    ${campoSolicitacao}
     ${newSsButton}          Set Variable     android=UiSelector().className("android.widget.Button")
     ${campoSolicitacao}     Set Variable     android=UiSelector().className("android.widget.EditText").instance(0)
@@ -867,3 +891,7 @@ Voltar ao Menu Principal
     
     Navegar Menu Principal
     Exportar Dados Pendentes
+
+Fechar Sessão
+    
+    Close All Applications

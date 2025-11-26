@@ -4,8 +4,7 @@ Library    AppiumLibrary
 Library    Process
 
 Resource    ../Resources/base.resource
-Resource    ../Resources/cfgMobile.resource
-Resource    ../Resources/cfgGeral.resource
+
 
 *** Variables ***
 
@@ -86,17 +85,36 @@ Gerar Banco de Dados
     Run Keyword And Ignore Error       Click Element    ${btnNao}
     
     Wait Until Page Contains    Selecionar Filial    60
-    Menu Options    Marcar Todas
+    
+    IF    ${cfmMultiEmp} == True
+       
+        Menu Options    Marcar Todas
+       
+        ELSE
+        Click Text    01
+        
+    END
+    
     Sleep    1
     Menu Options    Continuar
 
-    Wait Until Page Contains    Prosseguir sem importar O.S.    60
-    Click Text    Prosseguir sem importar O.S.
+       Sleep    10
+    ${limiteOS}=    Run Keyword And Return Status    Page Should Contain Text    a consulta de O.S.'s
 
-    Wait Until Page Contains    Banco de dados gerado e baixado com sucesso!    120
-    Click Text    Ok
+    IF    ${limiteOS} == False
+        
+        Wait Until Page Contains    Prosseguir sem importar O.S.    60
+        Click Text    Prosseguir sem importar O.S.
+        ELSE
+            Click Text    OK
+    END
+    
+    
+    Wait Until Page Contains    Banco de dados gerado e baixado com sucesso!    60
+    Mensagem    Banco de dados gerado e baixado com sucesso!    Ok
 
     Sleep    2
 
     Activate Application    ${appPackage}
     Sleep    5
+

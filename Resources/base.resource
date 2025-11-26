@@ -5,10 +5,14 @@ Library    DateTime
 Library    String
 Library    Collections
 
+Resource    ../Config/cfgMobile.resource
+Resource    ../Config/cfgGeral.resource
+Resource    ../Config/flags.resource
+
 *** Variables ***
 
 ${appName}         padrao
-${webservice}      10.12.1.5/wsmaui  
+${webservice}      wshml.engeman.com/wsmaui  
 ${saveButton}      //android.widget.ImageButton[@content-desc="Navigate up"] 
 
 ${menuSuperior}    //android.widget.ImageButton[@content-desc="Open navigation drawer"]
@@ -23,7 +27,8 @@ ${deviceName}      emulator-5554
 ${usbMode}         False
 
 
-
+#new UiSelector().resourceId("com.google.android.GoogleCamera:id/shutter_button")
+#//android.widget.ImageButton[@content-desc="Done"]
 
 *** Keywords ***
 
@@ -465,10 +470,29 @@ Anexo SS
     ${btnSelecionarAnexo}    Set Variable     android=UiSelector().text("Selecionar Anexo")
     ${btnCamera}             Set Variable     android=UiSelector().resourceId("com.android.camera2:id/shutter_button")
     ${btnDone}               Set Variable     android=UiSelector().resourceId("com.android.camera2:id/done_button")
+    ${btnCameraUSB}          Set Variable     //android.widget.ImageButton[@content-desc="Take photo"]
+    ${btnDoneUSB}            Set Variable     //android.widget.ImageButton[@content-desc="Done"]
     
     
 
     Menu Options    Anexo
+
+    IF    ${flagRegSalvo} == ${False}
+        
+        IF    "${cfgAplicJaPossuiSS}" == "A"
+            Mensagem    As seguintes S.S.'s já estão abertas para a aplicação   Sim
+            ${flagRegSalvo}    Set Variable    ${True}
+            ELSE IF   "${cfgAplicJaPossuiSS}" == "B" 
+                
+                Mensagem    As seguintes S.S.'s já estão abertas para a aplicação   OK
+                Menu Options    Descartar Alterações
+            ELSE IF    "${cfgAplicJaPossuiSS}" == "N"
+                ${flagRegSalvo}    Set Variable    ${True}
+        END
+
+    END
+
+
     Wait Until Page Contains    Listagem de Anexo
     
     Click Element     ${newAnexoButton}
@@ -481,11 +505,7 @@ Anexo SS
     Wait Until Element Is Visible    android=UiSelector().resourceId("${appPackage}:id/parentPanel")
     Click Element    android=UiSelector().text("Câmera")
 
-    Wait Until Element Is Visible    ${btnCamera}
-    Click Element    ${btnCamera}
-
-    Wait Until Element Is Visible    ${btnDone}
-    Click Element    ${btnDone}
+    Tirar Foto
 
     Click Salvar
     
@@ -591,8 +611,7 @@ Anexo Servico
     ${optAnexoSimples}       Set Variable     //android.widget.TextView[@resource-id="android:id/text1" and @text="Anexo"]
     ${optAnexoMultiplo}      Set Variable     //android.widget.TextView[@resource-id="android:id/text1" and @text="Anexos múltiplos"]
     ${btnSelecionarAnexo}    Set Variable     android=UiSelector().text("Selecionar Anexo")
-    ${btnCamera}             Set Variable     android=UiSelector().resourceId("com.android.camera2:id/shutter_button")
-    ${btnDone}               Set Variable     android=UiSelector().resourceId("com.android.camera2:id/done_button")
+    
     
     Menu Options    Anexo
     Wait Until Page Contains    Listagem de Anexo
@@ -606,12 +625,10 @@ Anexo Servico
     Click Element    ${btnSelecionarAnexo}
     Wait Until Element Is Visible    android=UiSelector().resourceId("${appPackage}:id/parentPanel")
     Click Element    android=UiSelector().text("Câmera")
-
-    Wait Until Element Is Visible    ${btnCamera}
-    Click Element    ${btnCamera}
-
-    Wait Until Element Is Visible    ${btnDone}
-    Click Element    ${btnDone}
+    
+    Tirar Foto
+    
+    
 
     Click Salvar
     Wait Until Page Contains      Listagem    20   
@@ -699,4 +716,64 @@ Mensagem Erro
 
     END
 
-     
+Tirar Foto
+
+    ${btnCamera}             Set Variable     android=UiSelector().resourceId("com.android.camera2:id/shutter_button")
+    ${btnDone}               Set Variable     android=UiSelector().resourceId("com.android.camera2:id/done_button")
+    ${btnCameraUSB}          Set Variable     //android.widget.ImageButton[@content-desc="Take photo"]
+    ${btnDoneUSB}            Set Variable     //android.widget.ImageButton[@content-desc="Done"]
+
+    IF    ${usbMode} == True
+        Wait Until Element Is Visible    ${btnCameraUSB}
+        Click Element    ${btnCameraUSB}
+
+        Wait Until Element Is Visible    ${btnDoneUSB}
+        Click Element    ${btnDoneUSB}
+
+        ELSE
+        Wait Until Element Is Visible    ${btnCamera}
+        Click Element    ${btnCamera}
+
+        Wait Until Element Is Visible    ${btnDone}
+        Click Element    ${btnDone}
+        
+    END
+
+Gravar Video
+    [Arguments]    ${duracao}
+    
+
+    ${btnFilmar}          Set Variable     //android.widget.ImageButton[@content-desc="Start video"]
+    ${btnPararVideo}      Set Variable     //android.widget.ImageButton[@content-desc="Stop video"]
+    ${btnDone}            Set Variable     //android.widget.ImageButton[@content-desc="Done"]
+    
+    Mensagem    Atenção: para evitar possíveis problemas no armazenamento    Ok
+    Wait Until Element Is Visible    ${btnFilmar}
+    Click Element    ${btnFilmar}
+    
+    Sleep    ${duracao}
+    
+    Wait Until Element Is Visible    ${btnPararVideo}
+    Click Element    ${btnPararVideo}
+    
+    Wait Until Element Is Visible    ${btnDone}
+    Click Element    ${btnDone}
+
+
+#Passa por uma lista de permissões e retorna True caso todas sejam True, senão retorna False
+#@{list}    Create List    ${perm1}    ${perm2}    ...
+Permissao Acesso Mobile
+    [Arguments]    @{permissao}
+
+    FOR    ${i}    IN    @{permissao}
+        
+        IF    ${i} == False
+            
+            RETURN    False
+            
+        END
+        
+        
+    END
+    
+    RETURN    True

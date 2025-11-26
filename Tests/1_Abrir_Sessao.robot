@@ -4,14 +4,14 @@ Library    AppiumLibrary
 Library    Process
 
 Resource    ../Resources/base.resource
-Resource    ../Resources/cfgMobile.resource
-Resource    ../Resources/cfgGeral.resource
+
 
 *** Test Cases ***
 
 Abrir Tela Principal
     [Tags]    Sessao
     
-    Iniciar Sessão    ${appName}    C:\\QAx\\projects\\Maui\\${appPackage}.apk    true
-
-
+    Iniciar Sessão    ${appName}    C:\\QAx\\projects\\Maui\\com.engemanmaui.${appName}.apk    true
+    Start Screen Recording
+    Sleep    10
+    #Stop Screen Recording

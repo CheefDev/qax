@@ -4,8 +4,7 @@ Library    AppiumLibrary
 Library    Process
 
 Resource    ../Resources/base.resource
-Resource    ../Resources/cfgMobile.resource
-Resource    ../Resources/cfgGeral.resource
+
 
 
 *** Test Cases ***
@@ -13,6 +12,9 @@ Resource    ../Resources/cfgGeral.resource
 Cancelar O.S.  
     [Tags]    OS
     
+    @{permissao}    Create List    ${cfgmPerCancelaOS}    ${cfgmOrdServ}
+    ${acesso}    Permissao Acesso Mobile    @{permissao}
+
     Voltar Para    Início
     Sleep    1
     Remover Notificação
@@ -49,6 +51,10 @@ Cancelar O.S.
 
 Liberar O.S.  
     [Tags]    OS
+
+    @{permissao}    Create List    ${cfgmOrdServ}
+    ${acesso}    Permissao Acesso Mobile    @{permissao}
+
     Wait Until Page Contains    Lista de O.S.'s
     Click Element   android=UiSelector().textContains("Aberta")
 
@@ -113,3 +119,7 @@ Importar O.S.s
     END
     
     Click Element    ${btnInicio}
+    
+Stop Recording
+    Stop Screen Recording
+    

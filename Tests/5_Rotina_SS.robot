@@ -4,14 +4,17 @@ Library    AppiumLibrary
 Library    Process
 
 Resource    ../Resources/base.resource
-Resource    ../Resources/cfgMobile.resource
-Resource    ../Resources/cfgGeral.resource
+
 
 
 *** Test Cases ***
 
 Cadastro S.S.
     [Tags]    Cadastro    Anexo    SS
+
+    @{permissao}    Create List    ${cfgmSolic}
+    ${acesso}    Permissao Acesso Mobile    @{permissao}
+
     ${newSsButton}         Set Variable     android=UiSelector().className("android.widget.Button")
     
     ${campoSolicitacao}    Set Variable     android=UiSelector().className("android.widget.EditText").instance(0)
@@ -41,8 +44,8 @@ Cadastro S.S.
     ${campoUrgencia}        Set Variable     android=UiSelector().className("android.widget.EditText").instance(5)
     ${searchAplicacao}      Set Variable     android=UiSelector().className("android.widget.ImageView").instance(9)
     ${searchCentroCusto}    Set Variable     android=UiSelector().className("android.widget.ImageView").instance(12)
-    ${btnSim}    Set Variable    android=UiSelector().resourceId("android:id/button1")
-    ${btnNao}    Set Variable    android=UiSelector().resourceId("android:id/button2")
+    ${btnSim}               Set Variable     android=UiSelector().resourceId("android:id/button1")
+    ${btnNao}               Set Variable     android=UiSelector().resourceId("android:id/button2")
         
     Wait Until Element Is Visible    ${campoSolicitacao}
     #Click Element     ${campoSolicitacao}
@@ -71,7 +74,8 @@ Cadastro S.S.
     #Campo Pesquisa    ${searchSetor}    1
     #Campo Pesquisa    ${searchTipoManut}    1
     #Campo Pesquisa    ${searchLocalizacao}    1
-        
+
+    #Tratar Configuracao ${cfgAplicJaPossuiSS}    
     Anexo SS
 
     Click Salvar
@@ -83,6 +87,11 @@ Cadastro S.S.
 
 Aprovar e Gerar O.S.
     [Tags]    Cadastro    SS    OS
+
+    @{permissao}    Create List    ${cfgmOrdServ}    ${cfgmAbrirOS}    ${cfgmSolic}
+    ${acesso}    Permissao Acesso Mobile    @{permissao}
+
+
     ${cardSS}    Set Variable   android=UiSelector().className("android.view.ViewGroup").instance(16)
 
 
@@ -90,14 +99,18 @@ Aprovar e Gerar O.S.
     Wait Until Page Contains    Solicitação de Serviço
 
     Menu Options    Aprovar e Gerar O.S.
+
+    IF    ${cfgmAbrirOS} == False
+    
+        Mensagem  Essa funcionalidade encontra-se bloqueada    Ok  
+        Skip    Dispositivo não tem permissão para abrir O.S.
+
+    END
     
     #Tratamento caso já exista O.S. aberta nessa S.S.
     Run Keyword And Ignore Error    Wait Until Page Contains    Existe outra O.S.
     Run Keyword And Ignore Error    Click Text    Sim
     
     Cadastro OS Basica
-    Click Salvar
-    Wait Until Page Contains    Solicitação de Serviço
-    Click Salvar
-    Wait Until Page Contains    Lista de S.S.'s
+    
     Navegar Menu Principal

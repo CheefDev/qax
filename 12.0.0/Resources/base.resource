@@ -5,10 +5,13 @@ Library    DateTime
 Library    String
 Library    Collections
 
+Resource    ../../Config/flags.resource
+Resource    ../../Config/cfgGeral.resource
+Resource    ../../Config/cfgMobile.resource
 *** Variables ***
 
-${appName}         Maui
-${webservice}      wshml.engeman.com/ws${appName}  
+${appName}         pindorama
+${webservice}      wshml.engeman.com/wsmaui${appName}
 ${saveButton}      //android.widget.ImageButton[@content-desc="Navigate up"] 
 
 ${menuSuperior}    //android.widget.ImageButton[@content-desc="Open navigation drawer"]
@@ -16,67 +19,10 @@ ${menuOptions}     //android.widget.ImageView[@content-desc="More options"]
 ${btnVoltar}       android=UiSelector().description("Navigate up")
 ${btnSalvar}       android=UiSelector().description("Navigate up")
 ${message}         //android.widget.TextView[@resource-id="android:id/message"]
-${appPackage}      com.engemanmaui.padrao
+${appPackage}      com.engemanmaui.${appName}
 ${deviceName}      21151FDF60007B
 
-#Modo USB
-${usbMode}         True
 
-
-#Configurações Gerais
-#N - Nada
-#B - Bloquear
-#A - Avisar
-
-#Config Gerais -> Geral -> Ordem De Serviço -> Segurança
-${cfgMaterialNaoRelacionadoAplic}     N
-${cfgFuncOutroSetor}                  B
-${cfgFuncOutraFilial}                 B
-${cfgFuncNaoQualificado}              B
-${cfgFuncOutroCargo}                  B
-${cfgFuncForaDaEscala}                B
-${cfgAgrupamentoDivergAplic}          B
-${cfgFuncAntesDataProg}               A    
-${cfgAplicJaPossuiOS}                 N
-${cfgAplicNaGarantia}                 A
-${cfgAtDataManutencao}                N
-${cfgPlanoNaoRelacAplicCont}          N
-${cfgFuncQualifVencida}               A
-${cfgFuncAntDataProg}                 A
-${cfgPlanejHrsSuperiorAPrev}          N
-${cfgPlanejHrsInferiorAPrev}          N
-${cfgLimiteAlocacaoMaoDeObra}         11
-${cfgDataParouInferorDataProg}        A
-${cfgFechVerifAplicParouFuncionou}    N
-${cfgFechOSReqPendente}               N
-${cfgRegMatSMapeamento}               A
-${cfgExigeMotLib}                     S
-${cfgPerAvalOSdeSS}                   S
-${cfgFecharServNExec}                 A
-${cfgFecMatSemQuant}                  A
-${cfgFecMatAdSemQuant}                A
-${cfgFecMatSemAlm}                    A
-
-#Configurações Gerais -> Dispositivos Móveis -> Segurança
-
-${cfmMultiEmp}                True
-${cfmUserNaAssinatura}        True
-${cfmImportaAnexos}           True
-
-#As Duas são a mesma configuração, porém há opção para bloquear só ao fechar ou liberar.
-${cfmFecharSemDataTermino}     B
-${cfmLiberarSemDataTermino}    N
-
-
-${cfmFecharOSSemMidia}         B
-${cfmLiberarOSSemMidia}        B
-${cfgFechFuncPrev}             A
-#Config Limite de Variação Mobile
-
-${cfmLimiteAcumulativa}       10
-${cfmLimiteTendencia}         10
-
-${cfmImportObsPlano}          True
 
 
 *** Keywords ***
@@ -370,7 +316,7 @@ Preencher Rota de Coleta
                 ${is_visible}=    Run Keyword And Return Status    Element Should Be Visible    ${item}
                 
                 IF    $is_visible == False
-                    Swipe    ${450}    ${2000}    ${450}    ${1750}    1000
+                    Swipe    ${450}    ${2000}    ${450}    ${1700}    1000
                     Sleep    0.5
                     ${is_visible}=    Run Keyword And Return Status    Element Should Be Visible    ${item}
                 END
@@ -385,9 +331,14 @@ Preencher Rota de Coleta
                 ${is_visible}=    Run Keyword And Return Status    Element Should Be Visible    ${campo}
                 
                 IF    $is_visible == False
-                    Swipe    ${450}    ${2000}    ${450}    ${1750}    1000
+                    Swipe    ${450}    ${2000}    ${450}    ${1800}    1000
                     Sleep    0.5
                     ${is_visible}=    Run Keyword And Return Status    Element Should Be Visible    ${item}
+                    IF    $is_visible == False
+                        Swipe    ${450}    ${2000}    ${450}    ${1800}    1000
+                        Sleep    0.5
+                        ${is_visible}=    Run Keyword And Return Status    Element Should Be Visible    ${item}
+                    END
                 END
                 ${textoCampo}    Get Element Attribute    ${campo}    text
                 
@@ -446,7 +397,7 @@ Preencher Coleta Unificada
                 ${is_visible}=    Run Keyword And Return Status    Element Should Be Visible    ${item}
                 
                 IF    $is_visible == False
-                    Swipe    ${450}    ${2000}    ${450}    ${1750}    1000
+                    Swipe    ${450}    ${2000}    ${450}    ${1720}    1000
                     Sleep    0.5
                     ${is_visible}=    Run Keyword And Return Status    Element Should Be Visible    ${item}
                 END
@@ -462,7 +413,7 @@ Preencher Coleta Unificada
                 ${is_visible}=    Run Keyword And Return Status    Element Should Be Visible    ${campo}
                 
                 IF    $is_visible == False
-                    Swipe    ${450}    ${2000}    ${450}    ${1750}    1000
+                    Swipe    ${450}    ${2000}    ${450}    ${1720}    1000
                     Sleep    0.5
                     ${is_visible}=    Run Keyword And Return Status    Element Should Be Visible    ${item}
                 END
@@ -522,6 +473,22 @@ Anexo SS
     
 
     Menu Options    Anexo
+    
+    IF    ${flagRegSalvo} == ${False}
+        
+        IF    "${cfgAplicJaPossuiSS}" == "A"
+            Mensagem    As seguintes S.S.'s já estão abertas para a aplicação   Sim
+            ${flagRegSalvo}    Set Variable    ${True}
+            ELSE IF   "${cfgAplicJaPossuiSS}" == "B" 
+                
+                Mensagem    As seguintes S.S.'s já estão abertas para a aplicação   OK
+                Menu Options    Descartar Alterações
+            ELSE IF    "${cfgAplicJaPossuiSS}" == "N"
+                ${flagRegSalvo}    Set Variable    ${True}
+        END
+
+    END
+
     Wait Until Page Contains    Listagem de Anexo
     
     Click Element     ${newAnexoButton}
@@ -598,7 +565,7 @@ Exportar Dados Pendentes
 Mensagem
     [Arguments]    ${text}    ${option}
 
-    ${visible}=    Run Keyword And Return Status    Wait Until Page Contains    ${text}    2
+    ${visible}=    Run Keyword And Return Status    Wait Until Page Contains    ${text}    10
     ${mensagem}=    Get Element Attribute    android=UiSelector().resourceId("android:id/message")    text
     
     IF    ${visible}
@@ -614,6 +581,7 @@ Mensagem
 Mensagem Configuracao
     [Arguments]    ${config}    ${mensagem}    ${opcao}
     #Permissão para Cadastro de Funcionários fora da escala de trabalho
+    Sleep    5
     IF    "${config}" != "N"
         
         IF    "${config}" == "A"
@@ -641,8 +609,7 @@ Anexo Servico
     ${optAnexoSimples}       Set Variable     //android.widget.TextView[@resource-id="android:id/text1" and @text="Anexo"]
     ${optAnexoMultiplo}      Set Variable     //android.widget.TextView[@resource-id="android:id/text1" and @text="Anexos múltiplos"]
     ${btnSelecionarAnexo}    Set Variable     android=UiSelector().text("Selecionar Anexo")
-    ${btnCamera}             Set Variable     //android.widget.ImageButton[@content-desc="Take photo"]
-    ${btnDone}               Set Variable     //android.widget.ImageButton[@content-desc="Done"]
+    
     
     Menu Options    Anexo
     Wait Until Page Contains    Listagem de Anexo
@@ -656,12 +623,10 @@ Anexo Servico
     Click Element    ${btnSelecionarAnexo}
     Wait Until Element Is Visible    android=UiSelector().resourceId("${appPackage}:id/parentPanel")
     Click Element    android=UiSelector().text("Câmera")
-
-    Wait Until Element Is Visible    ${btnCamera}
-    Click Element    ${btnCamera}
-
-    Wait Until Element Is Visible    ${btnDone}
-    Click Element    ${btnDone}
+    
+    Tirar Foto
+    
+    
 
     Click Salvar
     Wait Until Page Contains      Listagem    20   
@@ -703,4 +668,26 @@ Inserir Texto
         Input Text    ${locator}    ${text}
 
     END
-    
+
+Tirar Foto
+
+    ${btnCamera}             Set Variable     android=UiSelector().resourceId("com.android.camera2:id/shutter_button")
+    ${btnDone}               Set Variable     android=UiSelector().resourceId("com.android.camera2:id/done_button")
+    ${btnCameraUSB}          Set Variable     //android.widget.ImageButton[@content-desc="Take photo"]
+    ${btnDoneUSB}            Set Variable     //android.widget.ImageButton[@content-desc="Done"]
+
+    IF    ${usbMode} == True
+        Wait Until Element Is Visible    ${btnCameraUSB}
+        Click Element    ${btnCameraUSB}
+
+        Wait Until Element Is Visible    ${btnDoneUSB}
+        Click Element    ${btnDoneUSB}
+
+        ELSE
+        Wait Until Element Is Visible    ${btnCamera}
+        Click Element    ${btnCamera}
+
+        Wait Until Element Is Visible    ${btnDone}
+        Click Element    ${btnDone}
+        
+    END
