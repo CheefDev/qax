@@ -91,6 +91,7 @@ Campo Pesquisa
     ${btnPesquisar}        Set Variable    android=UiSelector().className("android.widget.ImageView").instance(3)
     
     
+    
     Click Element    ${locator}
     Wait Until Page Contains    Pesquisa
     ${nomeCampo}    Get Element Attribute    android=UiSelector().textContains("Pesquisa")    text
@@ -789,3 +790,16 @@ Trocar Imagem
     ${result}=    Run Process    python    C:\\QAX\\projects\\maui\\resources\\FileReplacer.py    ${sourceImage}    ${replacedImage}  
         Should Be Equal As Integers    ${result.rc}    0    # Verify successful execution (return code 0)
         Log To Console    ${result.stdout}    # Log the script's standard output
+
+Pesquisa QRCode
+    [Arguments]    ${locator}    ${tag}
+    
+    Trocar Imagem    ${tag}
+
+    Click Element    ${locator}
+
+    Sleep    2
+
+    Page Should Contain Text    ${tag}
+
+
