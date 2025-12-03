@@ -4,6 +4,7 @@ Library    AppiumLibrary
 Library    DateTime
 Library    String
 Library    Collections
+Library    Process
 
 Resource    ../Config/cfgMobile.resource
 Resource    ../Config/cfgGeral.resource
@@ -777,3 +778,14 @@ Permissao Acesso Mobile
     END
     
     RETURN    True
+
+Trocar Imagem
+    [Arguments]    ${tag}= 002
+    
+    ${sourceImage}        Set Variable    C:\\QAX\\projects\\maui\\QRCode\\${tag}.png
+    ${replacedImage}      Set Variable    C:\\Users\\victor.faria\\AppData\\Local\\Android\\Sdk\\emulator\\resources\\poster.png
+    
+    
+    ${result}=    Run Process    python    C:\\QAX\\projects\\maui\\resources\\FileReplacer.py    ${sourceImage}    ${replacedImage}  
+        Should Be Equal As Integers    ${result.rc}    0    # Verify successful execution (return code 0)
+        Log To Console    ${result.stdout}    # Log the script's standard output
