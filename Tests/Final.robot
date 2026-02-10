@@ -75,16 +75,19 @@ Liberar O.S.
     Inserir Texto       ${cJustificativa}    Justificativa Automatizada
     Click Element    ${btnOK}
 
-    Wait Until Page Contains    Lista de O.S.'s
+    
+    Mensagem    Há registros de funcionários em desacordo    Ok
+
+    Wait Until Page Contains    O.S.
 
 Voltar ao Menu Principal
     
-    Navegar Menu Principal
+    Voltar Para    Início
     
 Exportar Dados
 
-    ${btnNotificacoes}    Set Variable    android=UiSelector().resourceId("com.engemanmaui.padrao:id/navigation_bar_item_icon_view").instance(1)
-
+    ${btnNotificacoes}    Set Variable    android=new UiSelector().resourceId("com.engemanmaui.empesa:id/navigation_bar_item_icon_view").instance(1)
+    ${btnInicio}          Set Variable    android=new UiSelector().resourceId("com.engemanmaui.empesa:id/navigation_bar_item_icon_view").instance(0)
     Wait Until Page Contains Element    ${btnNotificacoes}
     Click Element    ${btnNotificacoes}
 
@@ -100,8 +103,8 @@ Exportar Dados
 Importar O.S.s
     
    
-    ${btnNotificacoes}    Set Variable    android=UiSelector().className("android.widget.FrameLayout").instance(10)
-    ${btnInicio}          Set Variable    android=UiSelector().className("android.widget.FrameLayout").instance(9)
+    ${btnNotificacoes}    Set Variable    android=new UiSelector().className("android.widget.FrameLayout").instance(9)
+    ${btnInicio}          Set Variable    android=new UiSelector().className("android.widget.FrameLayout").instance(8)
 
     Click Element     ${btnNotificacoes}
     

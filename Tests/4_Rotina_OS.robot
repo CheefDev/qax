@@ -41,7 +41,7 @@ Cadastro OS Local
     Sleep    1
     Remover Notificação    
     
-    ${menuSuperior}    Set Variable    //android.widget.ImageButton[@content-desc="Open navigation drawer"]
+    ${menuSuperior}    Set Variable    //android.widget.ImageButton[@content-desc="Abrir gaveta de navegação"]
     Wait Until Page Contains Element    ${menuSuperior}
     Click Element    ${menuSuperior}
 
@@ -98,29 +98,33 @@ Cadastro OS Local
     Wait Until Page Contains    Cadastro da O.S.
     
     Click Salvar
-
+    Sleep    20
+    
     IF    ${flagRegSalvo} == ${False}
         
-        IF    "${cfgAplicJaPossuiSS}" == "A"
-            Mensagem    As seguintes    Sim
+        IF    "${cfgAplicJaPossuiOS}" == "A"
+            Sleep    1
+            Mensagem    As seguintes O.S.'s já estão abertas   Sim
             ${flagRegSalvo}    Set Variable    ${True}
-            ELSE IF   "${cfgAplicJaPossuiSS}" == "B" 
+            ELSE IF   "${cfgAplicJaPossuiOS}" == "B" 
                 
-                Mensagem    As seguintes    OK
+                Mensagem    As seguintes O.S.'s já estão abertas     OK
                 Menu Options    Descartar Alterações
-            ELSE IF    "${cfgAplicJaPossuiSS}" == "N"
+            ELSE IF    "${cfgAplicJaPossuiOS}" == "N"
                 ${flagRegSalvo}    Set Variable    ${True}
         END
 
     END
-
+    
     Wait Until Page Contains    Salvando registro
+    
+    Mensagem    As seguintes O.S.'s já estão abertas   Sim
 
     ${msg}    Set Variable    android=UiSelector().resourceId("android:id/message")
     Wait Until Page Contains    validada no servidor com sucesso!    30
     
-    ${textoMsg}    Get Element Attribute    ${msg}    text
-    ${parts}                   Split String             ${textoMsg}
+    ${textoMsg}               Get Element Attribute    ${msg}    text
+    ${parts}                  Split String             ${textoMsg}
     ${codigoOS}               Set Variable             ${parts}[4]
     Click Element    ${btnOk}
     Log To Console    \nOS Gerada: ${codigoOS}
@@ -144,7 +148,6 @@ Cadastro OS Local
 Encerramento    
     [Tags]    Cadastro    OS    Encerramento
     
-    Skip
     
     @{permissao}    Create List    ${cfgmPerEncerra}    ${cfgmOrdServ}
     ${acesso}    Permissao Acesso Mobile    @{permissao}
@@ -167,29 +170,25 @@ Encerramento
     Wait Until Page Contains    Encerramento
     Click Text    Encerramento
     Wait Until Page Contains    Encerramento da O.S.
-
-    #Campo Data        ${aplFuncionou}       ${True}
-    #Click Salvar
-    #Mensagem    Valores inconsistentes!    Ok
     
-    #Campo Data        ${aplParou}           ${True}
-
-    Campo Data        ${dataRecebimento}    ${True}
+    Campo Data        ${aplParou}           ${True}
+    Campo Data        ${aplFuncionou}       ${True}
+   
+    #Campo Data        ${dataRecebimento}    ${True}
     Campo Pesquisa    ${recebidoPor}        JULINHO
     Campo Pesquisa    ${produto}            BATATA
-    #Campo Pesquisa   ${motAtraso}
-    #Click Element     ${interfReal}
+    Campo Pesquisa    ${motAtraso}          FALTA DE FERRAMENTAL
+    
     Inserir Texto        ${interfReal}      5
-    #Click Element     ${interfRealpc}
+    
     Inserir Texto        ${interfRealpc}    100     
 
     Click Salvar
     Wait Until Page Contains    Cadastro
 
+
 Cadastrar Anexo
     [Tags]    Cadastro    OS    Anexo
-    
-    
     
     
     @{permissao}    Create List    ${cfgmAbrirOS}    ${cfgmOrdServ}
@@ -292,8 +291,8 @@ Cadastro Registro Funcionario
     Wait Until Element Is Visible    ${btnNewFuncionario}
     
     Click Element    ${primeiroRegistro}
-    #${menuOptions}          Set Variable    //android.widget.ImageView[@content-desc="More options"]
-    #Wait Until Element Is Visible    ${menuOptions}
+
+    Wait Until Element Is Visible    ${menuOptions}
     Sleep    1
     Menu Options    Excluir
     Wait Until Page Contains    Confirma a exclusão desse registro?
@@ -537,10 +536,7 @@ Coleta Unificada
     Wait Until Page Contains     reg(s)
     Menu Options    Coleta Unificada
 
-    Preencher Coleta Unificada
-    Wait Until Page Contains    reg(s)
-    
-    Click Salvar
+    Preencher Coleta Unificada OS
     Wait Until Page Contains    O.S.
 
 
@@ -602,8 +598,6 @@ Fechar O.S.
     ${msgExportar}       Set Variable    //android.widget.TextView[@text="Há dados de O.S.'s a exportar. Toque aqui para exportar."]
     ${btnOK}             Set Variable    android=UiSelector().resourceId("android:id/button2")
     
-    #Versão atual com erro após fechamento da O.S.
-    Skip
 
     Wait Until Page Contains    O.S.
     Menu Options    Fechar O.S.
@@ -630,17 +624,7 @@ Fechar O.S.
    
     ${coletaFechamento}    Run Keyword And Return Status    Wait Until Page Contains    Coleta Unificada
     IF    ${coletaFechamento} == True
-        Preencher Coleta Unificada
+        Preencher Coleta Unificada OS
     END
     
     Wait Until Page Contains    Lista de O.S.'s
-
-    Navegar Menu Principal
-    Run Keyword And Ignore Error    Wait Until Page Contains  ${msgExportar}
-    Run Keyword And Ignore Error    Click Element    ${msgExportar}  
-    
-    Wait Until Page Contains    Exportando tabelas    15
-    Wait Until Page Contains    Processo concluído com sucesso!    30
-
-    Click Element    ${btnOK}
-    Sleep    20

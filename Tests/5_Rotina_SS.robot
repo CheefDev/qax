@@ -76,9 +76,23 @@ Cadastro S.S.
     #Campo Pesquisa    ${searchLocalizacao}    1
 
     #Tratar Configuracao ${cfgAplicJaPossuiSS}    
+
     Anexo SS
 
     Click Salvar
+    
+    IF    "${cfgAplicJaPossuiSS}" == "A"
+            Sleep    1
+            Mensagem    As seguintes S.S.'s já estão abertas   Sim
+                ${flagRegSalvo}    Set Variable    ${True}
+            ELSE IF   "${cfgAplicJaPossuiSS}" == "B" 
+                
+                Mensagem    As seguintes S.S.'s já estão abertas     OK
+                Menu Options    Descartar Alterações
+            ELSE IF    "${cfgAplicJaPossuiSS}" == "N"
+                ${flagRegSalvo}    Set Variable    ${True}
+    END
+
 
     Wait Until Page Contains    A S.S. já foi salva e sincronizada com o servidor.    30
     Wait Until Element Is Visible    ${btnSim}   
