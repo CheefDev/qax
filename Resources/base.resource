@@ -12,12 +12,12 @@ Resource    ../Config/flags.resource
 
 *** Variables ***
 
-${appName}         padrao
-${webservice}      wshml.engeman.com/wsmaui  
+${appName}         empesa
+${webservice}      wsdev.engeman.com:8443/wsmaui${appName}
 ${saveButton}      //android.widget.ImageButton[@content-desc="Navigate up"] 
 
-${menuSuperior}    //android.widget.ImageButton[@content-desc="Open navigation drawer"]
-${menuOptions}     //android.widget.ImageView[@content-desc="More options"]
+${menuSuperior}    //android.widget.ImageButton[@content-desc="Abrir gaveta de navegação"]
+${menuOptions}     //android.widget.ImageView[@content-desc="Mais opções"]
 ${btnVoltar}       UiSelector().className("android.widget.ImageView").instance(0)
 ${btnSalvar}       UiSelector().className("android.widget.ImageView").instance(0)
 ${message}         //android.widget.TextView[@resource-id="android:id/message"]
@@ -25,11 +25,12 @@ ${appPackage}      com.engemanmaui.${appName}
 ${deviceName}      emulator-5554
 
 #Modo USB
-${usbMode}         False
+${usbMode}         True
+
 
 
 #new UiSelector().resourceId("com.google.android.GoogleCamera:id/shutter_button")
-#//android.widget.ImageButton[@content-desc="Done"]
+#//android.widget.ImageButton[@content-desc="Concluído"]
 
 *** Keywords ***
 
@@ -46,10 +47,7 @@ Iniciar Sessão
     ...            autoDismissAlerts=true
     #...           enforce_xpath1=True
     
-    IF    $deviceName == '21151FDF60007B'
-        ${usbMode}    Set Variable    True
-        
-    END
+    
     Log To Console    \nDevice: ${deviceName} \nUSBMode: ${usbMode}
 
 Click Salvar
@@ -75,7 +73,7 @@ Menu Superior
 Menu Options
     [Arguments]    ${option_text}
     
-    ${menuOptions}     Set Variable    //android.widget.ImageView[@content-desc="More options"]
+    ${menuOptions}     Set Variable    //android.widget.ImageView[@content-desc="Mais opções"]
 
     Wait Until Element Is Visible    ${menuOptions}    15
     Click Element    ${menuOptions}
@@ -172,8 +170,6 @@ Campo Data
     Log To Console     ${dateTime}
     
     
-    
-        
         #Click no campo de Horas a partir do texto ":" já que os minutos são provaveis de mudar durante a execução
         Wait Until Page Contains    :
         Click Text    :
@@ -181,43 +177,38 @@ Campo Data
         #Acessar o campo Minutos pela localização a partir do Label
         ${location}         Get Element Location    android=UiSelector().text("Minutos")
         ${offset}           Set Variable    100
-        ${newY}             Evaluate       ${location['y']} + ${offset}
-        ${campoMinutes}     Set Variable   //android.widget.EditText[@text="${minutes}"]
-        @{newPosition}      Create List    ${location['x']}    ${newY}
-        Tap With Positions    500          ${newPosition}
+        #${newY}             Evaluate       ${location['y']} + ${offset}
+        ${campoHours}       Set Variable   //android.widget.FrameLayout[@resource-id="com.engemanmaui.empesa:id/navigationlayout_content"]/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[2]/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.widget.EditText[1]
+        ${campoMinutes}     Set Variable   //android.widget.FrameLayout[@resource-id="com.engemanmaui.empesa:id/navigationlayout_content"]/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[2]/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.widget.EditText[2]
+        #@{newPosition}      Create List    ${location['x']}    ${newY}
+        #Tap With Positions    500          ${newPosition}
+
+        Click Element    ${campoMinutes}
         
         ${15}    Set Variable    15
         ${0}     Set Variable    0
         
-        
+        ${minutes}    Convert To Integer      ${minutes}
+        ${hour}       Convert To Integer      ${hour}
+
         IF     ${subtract}
-            ${newMinutes}    Evaluate    ${minutes} - 1
+            ${newMinutes}    Evaluate    int(${minutes}) - 1
+            Swipe    ${405}    ${416}    ${405}    ${560}    ${200}
             ELSE    
             
             ${newMinutes}    Evaluate    ${minutes} + 10 
         END
         
-        IF    ${newMinutes} > 15
-            Swipe    ${428}    ${1467}    ${450}    ${346}
-            
+        IF    ${newMinutes} < 0
+            ${newMinutes}    Evaluate    0
         END
-        IF    ${newMinutes} > 25
-            Swipe    ${428}    ${1467}    ${450}    ${346}
-            
+        
+        IF    ${newMinutes} > 60
+            ${newMinutes}    Evaluate    59 
         END
-        IF    ${newMinutes} > 35
-            Swipe    ${428}    ${1467}    ${450}    ${346}
-            
-        END
-        IF    ${newMinutes} > 45
-            Swipe    ${428}    ${1467}    ${450}    ${346}
-            
-        END
-        IF    ${newMinutes} > 55
-            Swipe    ${428}    ${1467}    ${450}    ${346}
-            
-        END
-        ${selectMinutes}    Set Variable    //android.widget.TextView[@resource-id="android:id/text1" and @text="${newMinutes}"]
+
+        
+        ${selectMinutes}    Set Variable    //android.widget.ListView[@resource-id="com.engemanmaui.empesa:id/select_dialog_listview"]/android.widget.CheckedTextView[@text="${newMinutes}"]
        
         Wait Until Page Contains Element    ${selectMinutes}
         Click Element    ${selectMinutes}
@@ -460,6 +451,92 @@ Preencher Coleta Unificada
     Wait Until Page Contains    Registros
     RETURN    True
 
+Preencher Coleta Unificada OS
+    
+    ${labelSuperior}    Set Variable             android=UiSelector().textContains("reg(s)").instance(0)
+    Wait Until Element Is Visible        ${labelSuperior}
+    ${labelText}        Get Element Attribute    ${labelSuperior}    text
+
+    ${parts}            Split String             ${labelText}
+    
+    ${regCount}         Set Variable    ${parts}[4]
+    ${coletas}          Set Variable    0
+
+
+    Log To Console    \nNúmero de Registros na Rota: ${regCount}\n    
+    WHILE    ${coletas} < ${regCount}
+        
+        ${camposNaTela}    Get Matching Xpath Count       xpath=(//android.widget.TextView[contains(@text,"Valor")])
+        Log To Console    \nCampos na Tela: ${camposNaTela}\n
+        ${jaPreenchidos}    Set Variable    0
+        FOR    ${i}    IN RANGE    1    ${camposNaTela}+1
+                
+                ${item}    Set Variable         xpath=(//android.widget.TextView[contains(@text,"Valor")])[${i}]
+                
+                
+                ${is_visible}=    Run Keyword And Return Status    Element Should Be Visible    ${item}
+                
+                IF    $is_visible == False
+                    Swipe    ${450}    ${2000}    ${450}    ${1750}    1000
+                    Sleep    0.5
+                    ${is_visible}=    Run Keyword And Return Status    Element Should Be Visible    ${item}
+                END
+                
+                
+                ${bounds}    Get Element Attribute    ${item}     bounds
+                ${campo}    Set Variable        ${item}/following-sibling::android.widget.EditText[1]
+                #${textValor}    Set Variable    ${item}/following-sibling::android.widget.TextView[3]
+                ${iText}          Get Element Attribute    ${item}    text
+
+                #Log To Console    \n${iText}\n
+                #Log To Console    ${bounds}
+                ${is_visible}=    Run Keyword And Return Status    Element Should Be Visible    ${campo}
+                
+                IF    $is_visible == False
+                    Swipe    ${450}    ${2000}    ${450}    ${1750}    1000
+                    Sleep    0.5
+                    ${is_visible}=    Run Keyword And Return Status    Element Should Be Visible    ${item}
+                END
+                ${textoCampo}    Get Element Attribute    ${campo}    text
+                
+                IF    $textoCampo == ""
+                    ${parts}               Split String             ${iText}
+                    ${valor}               Set Variable             ${parts}[3]
+                    ${valor}               Remove String            ${valor}    )
+                    ${valor}               Replace String           ${valor}    ,    ${SPACE}
+                        
+                    ${partsValor}          Split String    ${valor}
+                    ${valor}    Set Variable    ${partsValor}[0]
+                    #Log To Console    \n${valor}\n
+                    
+                        
+                    ${newValor}    Evaluate    ${valor} + 1
+                    #Click Element    ${campo}
+                    Inserir Texto    ${campo}    ${newValor}
+
+                    #Log To Console    \n${newValor}\n
+                    ${coletas}    Evaluate    ${coletas} + 1
+                    Log To Console    \n${iText}\n
+                    Log To Console    ${valor} -> ${newValor}
+                    Log To Console    \nColetas: ${coletas}\n
+
+                ELSE
+                    ${jaPreenchidos}    Evaluate    ${jaPreenchidos} + 1
+                END
+                IF     ${jaPreenchidos} >= ${camposNaTela}
+                    Click Salvar
+                    Wait Until Page Contains    Registros
+                    RETURN    True
+                END
+            
+        END
+        Swipe    ${450}    ${2000}    ${450}    ${1200}    1000
+        Sleep    1
+    END
+    Click Salvar
+    Wait Until Page Contains    O.S.
+    RETURN    True
+
 Descartar Alterações
     
     Menu Options    Descartar Alterações
@@ -470,10 +547,7 @@ Anexo SS
     ${optAnexoSimples}       Set Variable     //android.widget.TextView[@resource-id="android:id/text1" and @text="Anexo"]
     ${optAnexoMultiplo}      Set Variable     //android.widget.TextView[@resource-id="android:id/text1" and @text="Anexos múltiplos"]
     ${btnSelecionarAnexo}    Set Variable     android=UiSelector().text("Selecionar Anexo")
-    ${btnCamera}             Set Variable     android=UiSelector().resourceId("com.android.camera2:id/shutter_button")
-    ${btnDone}               Set Variable     android=UiSelector().resourceId("com.android.camera2:id/done_button")
-    ${btnCameraUSB}          Set Variable     //android.widget.ImageButton[@content-desc="Take photo"]
-    ${btnDoneUSB}            Set Variable     //android.widget.ImageButton[@content-desc="Done"]
+    
     
     
 
@@ -511,7 +585,6 @@ Anexo SS
 
     Click Salvar
     
-    
     Click Salvar
     
 
@@ -520,6 +593,8 @@ Anexo SS
 Cadastro OS Basica
     
     Wait Until Page Contains    Cadastro da O.S.
+    
+    ${flagRegSalvo}    Set Variable    False
 
     Swipe    ${325}    ${1751}    ${325}    ${505}
 
@@ -531,6 +606,26 @@ Cadastro OS Basica
     Campo Pesquisa    ${searchSetor}    1
     
     Click Salvar
+
+    #Tratamento caso já exista O.S. para a Aplicação
+    
+     IF    ${flagRegSalvo} == ${False}
+        
+        IF    "${cfgAplicJaPossuiOS}" == "A"
+            Sleep    1
+            Mensagem    As seguintes O.S.'s já estão abertas   Sim
+            ${flagRegSalvo}    Set Variable    ${True}
+            ELSE IF   "${cfgAplicJaPossuiOS}" == "B" 
+                
+                Mensagem    As seguintes O.S.'s já estão abertas     OK
+                Menu Options    Descartar Alterações
+            ELSE IF    "${cfgAplicJaPossuiOS}" == "N"
+                ${flagRegSalvo}    Set Variable    ${True}
+        END
+
+    END
+
+
     ${msg}    Set Variable    android=UiSelector().resourceId("android:id/message")
     Wait Until Page Contains    validada no servidor com sucesso!    30
     
@@ -541,8 +636,7 @@ Cadastro OS Basica
     Mensagem   validada no servidor com sucesso!    Ok 
     Log To Console    \nOS Gerada: ${codigoOS}
     
-    Wait Until Page Contains    Solicitação de Serviço    20
-    Click Salvar
+    Wait Until Page Contains    Lista de S.S.'s    20
 
 Exportar Dados Pendentes
 
@@ -599,10 +693,9 @@ Mensagem Configuracao
                 Menu Options    Descartar Alterações
                 Click Salvar
                 Wait Until Page Contains    O.S.
-                Pass Execution    Funcionário fora da escala, Cadastro bloqueado por uma Configuração Geral!
+                Pass Execution    Cadastro bloqueado por uma Configuração Geral!
             END
-            
-            
+ 
         END
     END
 
@@ -722,8 +815,8 @@ Tirar Foto
 
     ${btnCamera}             Set Variable     android=UiSelector().resourceId("com.android.camera2:id/shutter_button")
     ${btnDone}               Set Variable     android=UiSelector().resourceId("com.android.camera2:id/done_button")
-    ${btnCameraUSB}          Set Variable     //android.widget.ImageButton[@content-desc="Take photo"]
-    ${btnDoneUSB}            Set Variable     //android.widget.ImageButton[@content-desc="Done"]
+    ${btnCameraUSB}          Set Variable     //android.widget.ImageButton[@content-desc="Tirar foto"]
+    ${btnDoneUSB}            Set Variable     //android.widget.ImageButton[@content-desc="Concluído"]
 
     IF    ${usbMode} == True
         Wait Until Element Is Visible    ${btnCameraUSB}
@@ -747,7 +840,7 @@ Gravar Video
 
     ${btnFilmar}          Set Variable     //android.widget.ImageButton[@content-desc="Start video"]
     ${btnPararVideo}      Set Variable     //android.widget.ImageButton[@content-desc="Stop video"]
-    ${btnDone}            Set Variable     //android.widget.ImageButton[@content-desc="Done"]
+    ${btnDone}            Set Variable     //android.widget.ImageButton[@content-desc="Concluído"]
     
     Mensagem    Atenção: para evitar possíveis problemas no armazenamento    Ok
     Wait Until Element Is Visible    ${btnFilmar}
@@ -801,5 +894,3 @@ Pesquisa QRCode
     Sleep    2
 
     Page Should Contain Text    ${tag}
-
-
