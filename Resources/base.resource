@@ -12,7 +12,7 @@ Resource    ../Config/flags.resource
 
 *** Variables ***
 
-${appName}         empesa
+${appName}         sulnorte
 ${webservice}      wsdev.engeman.com:8443/wsmaui${appName}
 ${saveButton}      //android.widget.ImageButton[@content-desc="Navigate up"] 
 
@@ -56,6 +56,8 @@ Click Salvar
     ${saveButton}     Set Variable    android=new UiSelector().className("android.widget.ImageView").instance(0)
     
     Wait Until Element Is Visible    ${saveButton}    20
+    
+    Sleep    1
     Click Element    ${saveButton}
     Sleep    1
 
@@ -178,8 +180,8 @@ Campo Data
         ${location}         Get Element Location    android=UiSelector().text("Minutos")
         ${offset}           Set Variable    100
         #${newY}             Evaluate       ${location['y']} + ${offset}
-        ${campoHours}       Set Variable   //android.widget.FrameLayout[@resource-id="com.engemanmaui.empesa:id/navigationlayout_content"]/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[2]/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.widget.EditText[1]
-        ${campoMinutes}     Set Variable   //android.widget.FrameLayout[@resource-id="com.engemanmaui.empesa:id/navigationlayout_content"]/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[2]/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.widget.EditText[2]
+        ${campoHours}       Set Variable   //android.widget.FrameLayout[@resource-id="com.engemanmaui.${appName}:id/navigationlayout_content"]/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[2]/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.widget.EditText[1]
+        ${campoMinutes}     Set Variable   //android.widget.FrameLayout[@resource-id="com.engemanmaui.${appName}:id/navigationlayout_content"]/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[2]/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.widget.EditText[2]
         #@{newPosition}      Create List    ${location['x']}    ${newY}
         #Tap With Positions    500          ${newPosition}
 
@@ -208,7 +210,7 @@ Campo Data
         END
 
         
-        ${selectMinutes}    Set Variable    //android.widget.ListView[@resource-id="com.engemanmaui.empesa:id/select_dialog_listview"]/android.widget.CheckedTextView[@text="${newMinutes}"]
+        ${selectMinutes}    Set Variable    //android.widget.ListView[@resource-id="com.engemanmaui.${appName}:id/select_dialog_listview"]/android.widget.CheckedTextView[@text="${newMinutes}"]
        
         Wait Until Page Contains Element    ${selectMinutes}
         Click Element    ${selectMinutes}
@@ -533,8 +535,10 @@ Preencher Coleta Unificada OS
         Swipe    ${450}    ${2000}    ${450}    ${1200}    1000
         Sleep    1
     END
+    
     Click Salvar
-    Wait Until Page Contains    O.S.
+    
+    Wait Until Page Contains    Serviços
     RETURN    True
 
 Descartar Alterações
@@ -582,7 +586,9 @@ Anexo SS
     Click Element    android=UiSelector().text("Câmera")
 
     Tirar Foto
-
+    
+    Sleep    1
+    
     Click Salvar
     
     Click Salvar
@@ -636,7 +642,7 @@ Cadastro OS Basica
     Mensagem   validada no servidor com sucesso!    Ok 
     Log To Console    \nOS Gerada: ${codigoOS}
     
-    Wait Until Page Contains    Lista de S.S.'s    20
+    Wait Until Page Contains    Solicitação de Serviço   20
 
 Exportar Dados Pendentes
 
@@ -874,9 +880,10 @@ Permissao Acesso Mobile
     RETURN    True
 
 Trocar Imagem
-    [Arguments]    ${tag}= 002
+    [Arguments]    ${tag}= TEST
     
-    ${sourceImage}        Set Variable    C:\\QAX\\projects\\maui\\QRCode\\${tag}.png
+    #${sourceImage}        Set Variable    C:\\QAX\\projects\\maui\\QRCode\\${tag}.png
+    ${sourceImage}        Set Variable    ${tag}
     ${replacedImage}      Set Variable    C:\\Users\\victor.faria\\AppData\\Local\\Android\\Sdk\\emulator\\resources\\poster.png
     
     

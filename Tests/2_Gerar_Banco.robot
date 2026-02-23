@@ -28,7 +28,7 @@ Digitar Webservice
     
     
     IF    ${gerarBanco} == False
-        Pass Execution    Banco já configurado!
+        Skip   Banco já configurado!
     END
     Wait Until Element Is Visible    ${cfgButton}    20
     Click Element    ${cfgButton}
@@ -47,7 +47,7 @@ ID Mobile
     
     
     IF    ${gerarBanco} == False
-        Pass Execution    Banco já configurado!
+        Skip    Banco já configurado!
     END
 
     IF    $idMobile == ''    
@@ -74,7 +74,7 @@ Gerar Banco de Dados
     ${gerarBanco}=    Run Keyword And Return Status    Page Should Not Contain Text  Login do Sistema 
     
     IF    ${gerarBanco} == False
-        Pass Execution    Banco já configurado!
+        Skip   Banco já configurado!
     END
     
     Wait Until Page Contains    Importar Dados

@@ -534,9 +534,12 @@ Coleta Unificada
     END
 
     Wait Until Page Contains     reg(s)
+
     Menu Options    Coleta Unificada
 
     Preencher Coleta Unificada OS
+
+    Click Salvar
     Wait Until Page Contains    O.S.
 
 

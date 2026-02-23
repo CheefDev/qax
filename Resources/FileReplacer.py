@@ -1,6 +1,8 @@
 import shutil
 import os
 import sys
+import requests
+
 
 def process_arguments(args):
     """Processes command-line arguments."""
@@ -15,9 +17,22 @@ def process_arguments(args):
 if __name__ == "__main__":
     process_arguments(sys.argv)
 
+tag = str(sys.argv[1])
+tag = str(tag)
+# The URL you want to make a GET request to
+url = "https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=" + tag
 
-source_file = sys.argv[1]
-destination_file = sys.argv[2]
+# Send the GET request and store the response
+response = requests.get(url)
+
+# Salva o conteúdo da resposta como png
+qrCodePath = str("C:\\qax\\projects\\maui\\QRCode\\" + tag + ".png")
+with open(qrCodePath , "wb") as f:
+    f.write(response.content) 
+
+
+source_file = qrCodePath
+destination_file = 'C:\\Users\\victor.faria\\AppData\\Local\\Android\\Sdk\\emulator\\resources\\poster.png'
 
 # Option 1: Copy and replace (keeping the original source file)
 shutil.copy(source_file, destination_file) 

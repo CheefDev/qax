@@ -44,6 +44,7 @@ Rota de Coleta Unificada
     Preencher Rota de Coleta
 
     Click Salvar
+    Click Salvar
     Wait Until Page Contains    Configuração para Rota de Coleta    60
     
     Navegar Menu Principal

@@ -86,8 +86,8 @@ Voltar ao Menu Principal
     
 Exportar Dados
 
-    ${btnNotificacoes}    Set Variable    android=new UiSelector().resourceId("com.engemanmaui.empesa:id/navigation_bar_item_icon_view").instance(1)
-    ${btnInicio}          Set Variable    android=new UiSelector().resourceId("com.engemanmaui.empesa:id/navigation_bar_item_icon_view").instance(0)
+    ${btnNotificacoes}    Set Variable    android=new UiSelector().resourceId("com.engemanmaui.${appName}:id/navigation_bar_item_icon_view").instance(1)
+    ${btnInicio}          Set Variable    android=new UiSelector().resourceId("com.engemanmaui.${appName}:id/navigation_bar_item_icon_view").instance(0)
     Wait Until Page Contains Element    ${btnNotificacoes}
     Click Element    ${btnNotificacoes}
 
