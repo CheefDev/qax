@@ -27,7 +27,7 @@ ${menuOptions}     //android.widget.ImageView[@content-desc="Mais opções"]
 ${btnVoltar}       android=UiSelector().className("android.widget.ImageView").instance(0)
 ${btnSalvar}       android=UiSelector().className("android.widget.ImageView").instance(0)
 ${message}         //android.widget.TextView[@resource-id="android:id/message"]
-${appPackage}      com.engemanmaui.${appName}app
+${appPackage}      com.engemanmaui.${appName}
 ${deviceName}      emulator-5554
 
 #Modo USBcampo
