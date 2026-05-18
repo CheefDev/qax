@@ -10,21 +10,27 @@ Resource    ../Config/cfgMobile.resource
 Resource    ../Config/cfgGeral.resource
 Resource    ../Config/flags.resource
 
+
+
 *** Variables ***
 
-${appName}         sulnorte
+#Usuario do pc, utilizado por algumas funções
+${user}            victor.faria
+
+#Manter o ${appName} todo minúsculo pois pode causar erros ao tentar abrir o app após a geração do banco de dados.
+${appName}         engesp
 ${webservice}      wsdev.engeman.com:8443/wsmaui${appName}
 ${saveButton}      //android.widget.ImageButton[@content-desc="Navigate up"] 
 
 ${menuSuperior}    //android.widget.ImageButton[@content-desc="Abrir gaveta de navegação"]
 ${menuOptions}     //android.widget.ImageView[@content-desc="Mais opções"]
-${btnVoltar}       UiSelector().className("android.widget.ImageView").instance(0)
-${btnSalvar}       UiSelector().className("android.widget.ImageView").instance(0)
+${btnVoltar}       android=UiSelector().className("android.widget.ImageView").instance(0)
+${btnSalvar}       android=UiSelector().className("android.widget.ImageView").instance(0)
 ${message}         //android.widget.TextView[@resource-id="android:id/message"]
-${appPackage}      com.engemanmaui.${appName}
+${appPackage}      com.engemanmaui.${appName}app
 ${deviceName}      emulator-5554
 
-#Modo USB
+#Modo USBcampo
 ${usbMode}         True
 
 
@@ -37,15 +43,18 @@ ${usbMode}         True
 
 Iniciar Sessão
     [Arguments]    ${appName}     ${appPath}    ${noReset}
+
+
+
     Open Application    http://localhost:4723
     ...            platformName=Android
     ...            automationName=UIAutomator2
-    ...            app=${appPath}
+    #...            app=${appPath}     #Deixar comentado caso o app já esteja instalado.
+    ...            appPackage=${appPackage}
     ...            deviceName=${deviceName}
     ...            autoGrantPermissions=true
     ...            noReset=${noReset}
     ...            autoDismissAlerts=true
-    #...           enforce_xpath1=True
     
     
     Log To Console    \nDevice: ${deviceName} \nUSBMode: ${usbMode}
@@ -57,15 +66,15 @@ Click Salvar
     
     Wait Until Element Is Visible    ${saveButton}    20
     
-    Sleep    1
+    Sleep    1s
     Click Element    ${saveButton}
-    Sleep    1
+    Sleep    1s
 
 
 Menu Superior
     [Arguments]    ${option_text}
     
-    Sleep    1
+    Sleep    1s
     Wait Until Element Is Visible    ${menuSuperior}    15
     Click Element    ${menuSuperior}
     
@@ -93,7 +102,7 @@ Campo Pesquisa
     
     
     Click Element    ${locator}
-    Wait Until Page Contains    Pesquisa
+    Wait Until Page Contains    Pesquisa    10
     ${nomeCampo}    Get Element Attribute    android=UiSelector().textContains("Pesquisa")    text
     ${nomeCampo}    Remove String    Pesquisa -
     ${parts}    Split String    ${nomeCampo}
@@ -102,10 +111,11 @@ Campo Pesquisa
     IF    '${text}' == '1'
         #Seleciona o primeiro item
         Click Element    ${btnPesquisar}
-        Wait Until Page Does Not Contain    Carregando    30
+        Sleep    3
+        #Wait Until Page Does Not Contain    Carregando    30
         Run Keyword And Ignore Error    Click Element  ${primeiroItem}
     ELSE
-        
+        Sleep    3
         ${visivel}=    Run Keyword And Return Status    Page Should Contain Text    ${text}
     
     IF    ${visivel}
@@ -135,7 +145,7 @@ Campo Pesquisa
 
 Descer Tela
     
-    Swipe    ${486}    ${1982}    ${486}    ${954}
+    Swipe    start_x=${486}    start_y=${1980}    end_x=${486}    end_y=${700}    duration=500ms
 
 Navegar Menu Principal
     ${continue}    Set Variable    True
@@ -195,7 +205,7 @@ Campo Data
 
         IF     ${subtract}
             ${newMinutes}    Evaluate    int(${minutes}) - 1
-            Swipe    ${405}    ${416}    ${405}    ${560}    ${200}
+            Swipe    start_x=${405}    start_y=${416}    end_x=${405}    end_y=${560}    duration=200ms
             ELSE    
             
             ${newMinutes}    Evaluate    ${minutes} + 10 
@@ -222,11 +232,11 @@ Campo Data
 Coleta Acumulativa
     [Arguments]    ${incremento}    ${defeito}=${False}
     
-    ${aplicacao}           Get Text          android=UiSelector().className("android.widget.EditText").instance(0)
-    ${pontoControle}       Get Text          android=UiSelector().className("android.widget.EditText").instance(1)
-    ${stringOriginal}      Get Text          android=UiSelector().textContains("Valor")
-    ${campoColeta}         Set Variable      android=UiSelector().className("android.widget.EditText").instance(3)
-    ${sDefeito}            Set Variable      android=UiSelector().className("android.widget.ImageView").instance(10)
+    ${aplicacao}           Get Text          android=new UiSelector().className("android.widget.EditText").instance(0)
+    ${pontoControle}       Get Text          android=new UiSelector().className("android.widget.EditText").instance(1)
+    ${stringOriginal}      Get Text          android=new UiSelector().textContains("Valor")
+    ${campoColeta}         Set Variable      android=new UiSelector().className("android.widget.EditText").instance(3)
+    ${sDefeito}            Set Variable      android=new UiSelector().className("android.widget.ImageView").instance(11)
     
     IF    ${defeito} == True
         
@@ -247,7 +257,10 @@ Coleta Acumulativa
             ${newValor}    Evaluate    ${valor} + ${incremento}
             
             
-            Inserir Texto      ${campoColeta}    ${newValor}
+           #Inserir Texto       ${campoColeta}    ${newValor}
+            Click Element       ${campoColeta}
+            Teclado Numerico    ${newValor}
+
             Click Salvar
             
             IF    ${newValor} < ${valor}
@@ -258,7 +271,7 @@ Coleta Acumulativa
                 Set Test Message            Informada Virada de Medidor!\n Aplicação: ${aplicacao}\n Ponto de Controle: ${pontoControle}\n Valor: ${valor} -> ${newValor}
             END
         
-            Wait Until Page Contains        Consultando limite de desvio
+            #Wait Until Page Contains        Consultando limite de desvio
         
             Wait Until Page Contains        Coletas Acumulativas
             Log To Console                  Coleta registrada:\n Aplicação: ${aplicacao}\n Ponto de Controle: ${pontoControle}\n Valor: ${valor} -> ${newValor}
@@ -268,28 +281,30 @@ Coleta Acumulativa
 Coleta Tendencia
     [Arguments]    ${incremento}
     
-    ${aplicacao}           Get Text          android=UiSelector().className("android.widget.EditText").instance(0)
-    ${pontoControle}       Get Text          android=UiSelector().className("android.widget.EditText").instance(1)
-    ${stringOriginal}      Get Text          android=UiSelector().textContains("Valor")
-    ${campoColeta}         Set Variable      android=UiSelector().className("android.widget.EditText").instance(4)
+    ${aplicacao}           Get Text          android=new UiSelector().className("android.widget.EditText").instance(0)
+    ${pontoControle}       Get Text          android=new UiSelector().className("android.widget.EditText").instance(1)
+    ${stringOriginal}      Get Text          android=new UiSelector().textContains("Valor")
+    ${campoColeta}         Set Variable      android=new UiSelector().className("android.widget.EditText").instance(4)
     
     #Extrair do label o valor da última coleta e trocar , por . para permitir o cálculo.
     ${parts}               Split String      ${stringOriginal}
     ${valor}               Set Variable      ${parts}[3]
     ${valor}               Remove String     ${valor}    )
-    ${valor}               Replace String    ${valor}    ,    .
+    ${valor}               Replace String    ${valor}    .    ,
     
     ${newValor}    Evaluate    ${valor} + ${incremento}
     
-    
-    Inserir Texto        ${campoColeta}    ${newValor}
+    Log To Console    ${newValor}
+   #Inserir Texto        ${campoColeta}    ${newValor}
+    Click Element        ${campoColeta}
+    Teclado Numerico     ${newValor}
     Click Salvar
     Wait Until Page Contains    Coleta Tendência
     Log To Console              Coleta registrada:\n Aplicação: ${aplicacao}\n Ponto de Controle: ${pontoControle}\n Valor: ${valor} -> ${newValor}
 
 Remover Notificação
     
-    Swipe    ${246}    ${280}    ${810}    ${280}    200
+    Swipe    start_x=${246}    start_y=${280}    end_x=${810}    end_y=${280}    duration=200ms
 
 Preencher Rota de Coleta
     
@@ -314,12 +329,12 @@ Preencher Rota de Coleta
                 ${item}    Set Variable         xpath=(//android.widget.TextView[contains(@text,"Valor")])[${i}]
                 
                 
-                ${is_visible}=    Run Keyword And Return Status    Element Should Be Visible    ${item}
+                ${is_visible}=    Run Keyword And Return Status    Expect Element   ${item}    visible
                 
                 IF    $is_visible == False
-                    Swipe    ${450}    ${2000}    ${450}    ${1750}    1000
+                    Swipe    start_x=${450}    start_y=${2000}    end_x=${450}    end_y=${1750}    duration=1000ms
                     Sleep    0.5
-                    ${is_visible}=    Run Keyword And Return Status    Element Should Be Visible    ${item}
+                    ${is_visible}=    Run Keyword And Return Status    Expect Element   ${item}    visible
                 END
                 
                 
@@ -329,12 +344,13 @@ Preencher Rota de Coleta
                 ${iText}          Get Element Attribute    ${item}    text
                 #Log To Console    \n${iText}\n
                 #Log To Console    ${bounds}
-                ${is_visible}=    Run Keyword And Return Status    Element Should Be Visible    ${campo}
+                ${is_visible}=    Run Keyword And Return Status    Expect Element   ${campo}    visible
                 
                 IF    $is_visible == False
-                    Swipe    ${450}    ${2000}    ${450}    ${1750}    1000
+                    Swipe    start_x=${450}    start_y=${2000}    end_x=${450}    end_y=${1750}    duration=1000ms
                     Sleep    0.5
-                    ${is_visible}=    Run Keyword And Return Status    Element Should Be Visible    ${item}
+                    ${campo}    Set Variable        ${item}/following-sibling::android.widget.EditText[1]
+                    ${is_visible}=    Run Keyword And Return Status    Expect Element   ${item}    visible
                 END
                 ${textoCampo}    Get Element Attribute    ${campo}    text
                 
@@ -351,7 +367,9 @@ Preencher Rota de Coleta
                         
                     ${newValor}    Evaluate    ${valor} + 1
                     
-                    Inserir Texto    ${campo}    ${newValor}
+                    #Inserir Texto    ${campo}    ${newValor}
+                    Click Element    ${campo}
+                    Teclado Numerico    ${newValor}
                     
                     #Log To Console    \n${newValor}\n
                     ${coletas}    Evaluate    ${coletas} + 1
@@ -363,7 +381,7 @@ Preencher Rota de Coleta
                 
             
         END
-        Swipe    ${450}    ${2000}    ${450}    ${1200}    1000
+        Swipe    start_x=${450}    start_y=${2000}    end_x=${450}    end_y=${1200}    duration=1000ms
         Sleep    1
     END
 
@@ -390,12 +408,12 @@ Preencher Coleta Unificada
                 ${item}    Set Variable         xpath=(//android.widget.TextView[contains(@text,"Valor")])[${i}]
                 
                 
-                ${is_visible}=    Run Keyword And Return Status    Element Should Be Visible    ${item}
+                ${is_visible}=    Run Keyword And Return Status    Expect Element   ${item}    visible
                 
                 IF    $is_visible == False
-                    Swipe    ${450}    ${2000}    ${450}    ${1750}    1000
+                    Swipe    start_x=${450}    start_y=${2000}    end_x=${450}    end_y=${1750}    duration=1000ms
                     Sleep    0.5
-                    ${is_visible}=    Run Keyword And Return Status    Element Should Be Visible    ${item}
+                    ${is_visible}=    Run Keyword And Return Status    Expect Element   ${item}    visible
                 END
                 
                 
@@ -406,12 +424,12 @@ Preencher Coleta Unificada
 
                 #Log To Console    \n${iText}\n
                 #Log To Console    ${bounds}
-                ${is_visible}=    Run Keyword And Return Status    Element Should Be Visible    ${campo}
+                ${is_visible}=    Run Keyword And Return Status    Expect Element   ${campo}    visible
                 
                 IF    $is_visible == False
-                    Swipe    ${450}    ${2000}    ${450}    ${1750}    1000
+                    Swipe    start_x=${450}    start_y=${2000}    end_x=${450}    end_y=${1750}    duration=1000ms
                     Sleep    0.5
-                    ${is_visible}=    Run Keyword And Return Status    Element Should Be Visible    ${item}
+                    ${is_visible}=    Run Keyword And Return Status    Expect Element   ${item}    visible
                 END
                 ${textoCampo}    Get Element Attribute    ${campo}    text
                 
@@ -446,7 +464,7 @@ Preencher Coleta Unificada
                 END
             
         END
-        Swipe    ${450}    ${2000}    ${450}    ${1200}    1000
+        Swipe    start_x=${450}    start_y=${2000}    end_x=${450}    end_y=${1200}    duration=1000ms
         Sleep    1
     END
     Click Salvar
@@ -476,12 +494,12 @@ Preencher Coleta Unificada OS
                 ${item}    Set Variable         xpath=(//android.widget.TextView[contains(@text,"Valor")])[${i}]
                 
                 
-                ${is_visible}=    Run Keyword And Return Status    Element Should Be Visible    ${item}
+                ${is_visible}=    Run Keyword And Return Status    Expect Element   ${item}    visible
                 
                 IF    $is_visible == False
-                    Swipe    ${450}    ${2000}    ${450}    ${1750}    1000
+                    Swipe    start_x=${450}    start_y=${2000}    end_x=${450}    end_y=${1750}    duration=1000ms
                     Sleep    0.5
-                    ${is_visible}=    Run Keyword And Return Status    Element Should Be Visible    ${item}
+                    ${is_visible}=    Run Keyword And Return Status    Expect Element   ${item}    visible
                 END
                 
                 
@@ -492,12 +510,12 @@ Preencher Coleta Unificada OS
 
                 #Log To Console    \n${iText}\n
                 #Log To Console    ${bounds}
-                ${is_visible}=    Run Keyword And Return Status    Element Should Be Visible    ${campo}
+                ${is_visible}=    Run Keyword And Return Status    Expect Element   ${campo}    visible
                 
                 IF    $is_visible == False
-                    Swipe    ${450}    ${2000}    ${450}    ${1750}    1000
+                    Swipe    start_x=${450}    start_y=${2000}    end_x=${450}    end_y=${1750}    duration=1000ms
                     Sleep    0.5
-                    ${is_visible}=    Run Keyword And Return Status    Element Should Be Visible    ${item}
+                    ${is_visible}=    Run Keyword And Return Status    Expect Element   ${item}    visible
                 END
                 ${textoCampo}    Get Element Attribute    ${campo}    text
                 
@@ -532,13 +550,13 @@ Preencher Coleta Unificada OS
                 END
             
         END
-        Swipe    ${450}    ${2000}    ${450}    ${1200}    1000
+        Swipe    start_x=${450}    start_y=${2000}    end_x=${450}    end_y=${1200}    duration=1000ms
         Sleep    1
     END
     
     Click Salvar
     
-    Wait Until Page Contains    Serviços
+
     RETURN    True
 
 Descartar Alterações
@@ -602,7 +620,7 @@ Cadastro OS Basica
     
     ${flagRegSalvo}    Set Variable    False
 
-    Swipe    ${325}    ${1751}    ${325}    ${505}
+    Swipe    start_x=${325}    start_y=${1751}    end_x=${325}    end_y=${505}    duration=500ms
 
     ${searchTipoManut}    Set Variable    android=UiSelector().className("android.widget.ImageView").instance(10)
     ${searchSetor}        Set Variable    android=UiSelector().className("android.widget.ImageView").instance(13)
@@ -884,7 +902,7 @@ Trocar Imagem
     
     #${sourceImage}        Set Variable    C:\\QAX\\projects\\maui\\QRCode\\${tag}.png
     ${sourceImage}        Set Variable    ${tag}
-    ${replacedImage}      Set Variable    C:\\Users\\victor.faria\\AppData\\Local\\Android\\Sdk\\emulator\\resources\\poster.png
+    ${replacedImage}      Set Variable    C:\\Users\\${user}\\AppData\\Local\\Android\\Sdk\\emulator\\resources\\poster.png
     
     
     ${result}=    Run Process    python    C:\\QAX\\projects\\maui\\resources\\FileReplacer.py    ${sourceImage}    ${replacedImage}  
@@ -901,3 +919,20 @@ Pesquisa QRCode
     Sleep    2
 
     Page Should Contain Text    ${tag}
+
+Teclado Numerico
+    [Arguments]    ${valor}
+    
+
+    ${my_string}=    Convert To String    ${valor}
+    ${characters}=    Evaluate    list($my_string)
+    Log List    ${characters}    # Result: ['R', 'o', 'b', 'o', 't']
+
+    FOR    ${char}    IN    @{characters}
+        
+        Click Element    android=new UiSelector().text("${char}")
+        #Sleep    0.5
+        
+    END
+
+    Click Element    android=new UiSelector().text("OK")

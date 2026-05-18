@@ -9,6 +9,10 @@ Resource    ../Resources/base.resource
 
 *** Test Cases ***
 
+Start Recording
+        Start Screen Recording    1800s
+
+
 Cadastro S.S.
     [Tags]    Cadastro    Anexo    SS
 
@@ -64,7 +68,7 @@ Cadastro S.S.
     Wait Until Page Contains    2 - Alta
     Click Text    2 - Alta
 
-    Swipe    ${383}    ${2127}    ${391}    ${450}
+    Swipe    start_x=${383}    start_y=${2127}    end_x=${391}    end_y=${450}    duration=500ms
 
     Sleep    2
 
@@ -132,3 +136,8 @@ Aprovar e Gerar O.S.
     Cadastro OS Basica
     
     Navegar Menu Principal
+
+Stop Recording
+    
+    Stop Screen Recording    RotinaSS
+    

@@ -22,10 +22,15 @@ Logar no app
     Input Password    ${passField}     engeman
     
     Click Element    ${buttonEntrar}
+    
+    IF    ${cfmMultiEmp} == True
+        Wait Until Page Contains    Selecionar Filial    10
 
-    Wait Until Page Contains    Selecionar Filial    10
-
-    Click Text   01
+        Click Text   01
+    END
+    
     Wait Until Page Contains    Início    10
     Remover Notificação
 
+    
+    

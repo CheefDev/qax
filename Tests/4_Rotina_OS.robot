@@ -9,23 +9,45 @@ Resource    ../Resources/base.resource
 
 *** Test Cases ***
 
+Start Recording
+        Start Screen Recording    1800s
+Importar OS's Pendentes
+    
+    ${notificacaoBtn}    Set Variable    android=new UiSelector().resourceId("${appPackage}:id/navigation_bar_item_icon_view").instance(1)
+    ${btnInicio}         Set Variable    android=new UiSelector().resourceId("${appPackage}:id/navigation_bar_item_icon_view").instance(0)
+    
+    Pass Execution    Será reimplementado!
+    Wait Until Element Is Visible    ${notificacaoBtn}
+    Click Element    ${notificacaoBtn}
+    Wait Until Page Contains    Notificações
+    ${OsAImportar}    Run Keyword And Return Status    Page Should Contain Text    O.S. a importar
+
+    IF    ${OsAImportar} == ${True}
+        Click Text    O.S. a 
+        Wait Until Page Contains  O.S. importada(s):    120
+        Mensagem    O.S. importada(s):     OK
+    END
+    
+    Click Element    ${btnInicio}
+
+
 Cadastro OS Local
     [Tags]    Cadastro    OS
-    
+
     @{permissoes}    Create List    ${cfgmAbrirOS}    ${cfgmOrdServ}
 
     ${acesso}    Permissao Acesso Mobile   @{permissoes}
     
-    ${sResponsavel}        Set Variable    android=UiSelector().className("android.widget.ImageView").instance(5)
-    ${sSolicitante}        Set Variable    android=UiSelector().className("android.widget.ImageView").instance(8)
+    ${sResponsavel}        Set Variable    android=new UiSelector().className("android.widget.ImageView").instance(5)
+    ${sSolicitante}        Set Variable    android=new UiSelector().className("android.widget.ImageView").instance(8)
     ${Solicitacao}         Set Variable    //androidx.drawerlayout.widget.DrawerLayout/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[2]/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup/android.widget.EditText[4]
     ${editSolicitacao}     Set Variable    //androidx.drawerlayout.widget.DrawerLayout/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[2]/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[4]/android.view.ViewGroup
-    ${sFornecedor}         Set Variable    android=UiSelector().className("android.widget.ImageView").instance(12)
-    ${sPlano}              Set Variable    android=UiSelector().className("android.widget.ImageView").instance(15)
-    ${sTipoManut}          Set Variable    android=UiSelector().className("android.widget.ImageView").instance(10)
-    ${sSetorExec}          Set Variable    android=UiSelector().className("android.widget.ImageView").instance(13)
-    ${sAplicacao}          Set Variable    android=UiSelector().className("android.widget.ImageView").instance(16)
-    ${sCentroCusto}        Set Variable    android=UiSelector().className("android.widget.ImageView").instance(19)
+    ${sFornecedor}         Set Variable    android=new UiSelector().className("android.widget.ImageView").instance(12)
+    ${sPlano}              Set Variable    android=new UiSelector().className("android.widget.ImageView").instance(15)
+    ${sTipoManut}          Set Variable    android=new UiSelector().className("android.widget.ImageView").instance(6)
+    ${sSetorExec}          Set Variable    android=new UiSelector().className("android.widget.ImageView").instance(9)
+    ${sAplicacao}          Set Variable    android=new UiSelector().className("android.widget.ImageView").instance(12)
+    ${sCentroCusto}        Set Variable    android=new UiSelector().className("android.widget.ImageView").instance(15)
     
     ${btnOk}               Set Variable    //android.widget.Button[@resource-id="android:id/button2"]
     ${btnSim}              Set Variable    //android.widget.Button[@resource-id="android:id/button1"]
@@ -33,6 +55,8 @@ Cadastro OS Local
 
     ${flagRegSalvo}        Set Variable    ${False}
     
+    
+
     Voltar Para    Início
     Sleep    1
     Remover Notificação
@@ -40,6 +64,8 @@ Cadastro OS Local
     
     Sleep    1
     Remover Notificação    
+    Sleep    1
+    Remover Notificação
     
     ${menuSuperior}    Set Variable    //android.widget.ImageButton[@content-desc="Abrir gaveta de navegação"]
     Wait Until Page Contains Element    ${menuSuperior}
@@ -53,6 +79,7 @@ Cadastro OS Local
         
     END
     
+
     Wait Until Page Contains    Ordem de Serviço
     Click Text   Ordem de Serviço
     Wait Until Page Contains    O.S. Mobile
@@ -69,33 +96,33 @@ Cadastro OS Local
     END
     
     
-    Wait Until Page Contains    Cadastro da O.S.
+    Wait Until Page Contains    Cadastro da O.S.    10
 
     Campo Pesquisa    ${sResponsavel}
-    Wait Until Page Contains    Cadastro da O.S.
+    Wait Until Page Contains    Cadastro da O.S.    10
 
     Campo Pesquisa    ${sSolicitante}
-    Wait Until Page Contains    Cadastro da O.S.
+    Wait Until Page Contains    Cadastro da O.S.    10
 
     Campo Pesquisa    ${sFornecedor}
-    Wait Until Page Contains    Cadastro da O.S.
+    Wait Until Page Contains    Cadastro da O.S.    10
 
     Campo Pesquisa    ${sPlano}
-    Wait Until Page Contains    Cadastro da O.S.
+    Wait Until Page Contains    Cadastro da O.S.    10
     
     Descer Tela
     Sleep    2
     Campo Pesquisa    ${sTipoManut}
-    Wait Until Page Contains    Cadastro da O.S.
+    Wait Until Page Contains    Cadastro da O.S.    10
 
     Campo Pesquisa    ${sSetorExec}
-    Wait Until Page Contains    Cadastro da O.S.
+    Wait Until Page Contains    Cadastro da O.S.    10
 
-    Campo Pesquisa    ${sAplicacao}
-    Wait Until Page Contains    Cadastro da O.S.
+    Campo Pesquisa    ${sAplicacao}    006
+    Wait Until Page Contains    Cadastro da O.S.    10
 
     Campo Pesquisa    ${sCentroCusto}
-    Wait Until Page Contains    Cadastro da O.S.
+    Wait Until Page Contains    Cadastro da O.S.    10
     
     Click Salvar
     Sleep    20
@@ -251,8 +278,8 @@ Cadastrar Assinatura
 
     Inserir Texto    ${campoDescricao}    Assinatura Automatizada
     
-    Swipe    ${124}    ${815}    ${834}    ${2087}    500
-    Swipe    ${834}    ${815}    ${124}    ${2087}    500
+    Swipe    start_x=${124}    start_y=${815}    end_x=${834}    end_y=${2087}    duration=500ms
+    Swipe    start_x=${834}    start_y=${815}    end_x=${124}    end_y=${2087}    duration=500ms
     
     Sleep    1
 
@@ -291,7 +318,8 @@ Cadastro Registro Funcionario
     Wait Until Element Is Visible    ${btnNewFuncionario}
     
     Click Element    ${primeiroRegistro}
-
+    
+    ${menuOptions}    Set Variable    //android.widget.ImageView[@content-desc="Mais opções"]
     Wait Until Element Is Visible    ${menuOptions}
     Sleep    1
     Menu Options    Excluir
@@ -348,7 +376,7 @@ Cadastro Requisição
     END
 
     #Swipe para o botão aparecer na tela
-    Swipe    ${479}    ${1345}    ${479}    ${1076}
+    Swipe    start_x=${479}    start_y=${1345}    end_x=${479}    end_y=${1076}    duration=500ms
     Skip
     ${btnOSRequisicao}      Set Variable    android=UiSelector().text("Requisição/Devolução")
     ${btnRequisicao}        Set Variable    android=UiSelector().text("Requisição")
@@ -457,7 +485,7 @@ Marcar Registros Serviço Como Executado
     ${totalServicos}    Set Variable    ${parts}[5]
 
     ${count}=    Get Matching Xpath Count    xpath=(${lista}/android.view.ViewGroup)
-    ${verificados}=    Set Variable    0
+    ${verificados}=    Set Variable    1
     @{listaVerificados}    Create List
     
     ${prevCount}   Set Variable    -1
@@ -521,7 +549,7 @@ Marcar Registros Serviço Como Executado
             Pass Execution    Fim do Scroll atingido!
         END
 
-        Swipe    ${103}    ${1401}    ${111}    ${918}
+        Swipe    start_x=${103}    start_y=${1401}    end_x=${111}    end_y=${918}    duration=500ms
     END
 
 Coleta Unificada
@@ -538,7 +566,7 @@ Coleta Unificada
     Menu Options    Coleta Unificada
 
     Preencher Coleta Unificada OS
-
+    Wait Until Page Contains    Serviços    60
     Click Salvar
     Wait Until Page Contains    O.S.
 
@@ -552,7 +580,7 @@ Interação
         Skip
     END
 
-    Swipe    ${391}    ${2178}    ${416}    ${394}
+    Swipe    start_x=${391}    start_y=${2178}    end_x=${416}    end_y=${394}    duration=500ms
 
     Wait Until Page Contains    Interação
     Click Text     Interação
@@ -631,3 +659,6 @@ Fechar O.S.
     END
     
     Wait Until Page Contains    Lista de O.S.'s
+
+Stop Recording
+    Stop Screen Recording    RotinaOS

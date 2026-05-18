@@ -1,6 +1,6 @@
 *** Settings ***
 
-Library    AppiumLibrary
+Library    AppiumLibrary    
 Library    Process
 
 Resource    ../Resources/base.resource
@@ -89,16 +89,17 @@ Gerar Banco de Dados
     IF    ${cfmMultiEmp} == True
        
         Menu Options    Marcar Todas
-       
+        Sleep    1s
+        Menu Options    Continuar
+        
         ELSE
-        Click Text    01
+            Click Element    android=new UiSelector().className("android.view.ViewGroup").instance(29)
         
     END
     
-    Sleep    1
-    Menu Options    Continuar
+   
 
-       Sleep    10
+       Sleep    10s
     ${limiteOS}=    Run Keyword And Return Status    Page Should Contain Text    a consulta de O.S.'s
 
     IF    ${limiteOS} == False
@@ -113,7 +114,7 @@ Gerar Banco de Dados
     Wait Until Page Contains    Banco de dados gerado e baixado com sucesso!    60
     Mensagem    Banco de dados gerado e baixado com sucesso!    Ok
 
-    Sleep    2
+    Sleep    2s
 
     Activate Application    ${appPackage}
-    Sleep    5
+    Sleep    5s

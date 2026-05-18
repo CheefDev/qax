@@ -18,7 +18,7 @@ if __name__ == "__main__":
     process_arguments(sys.argv)
 
 tag = str(sys.argv[1])
-tag = str(tag)
+
 # The URL you want to make a GET request to
 url = "http://api.qrserver.com/v1/create-qr-code/?size=150x150&margin=25&ecc=M&charset-target=UTF-8&data=" + tag
 
@@ -41,6 +41,5 @@ shutil.copy(source_file, destination_file)
 # Option 2: Move and replace (deleting the original source file)
 # os.replace() is a more robust way to move/rename and replace
 #os.replace(source_file, destination_file) 
-
 
 print("Arquivo Rodado!")

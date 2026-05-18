@@ -124,5 +124,5 @@ Importar O.S.s
     Click Element    ${btnInicio}
     
 Stop Recording
-    Stop Screen Recording
+    Stop Screen Recording    Final
     

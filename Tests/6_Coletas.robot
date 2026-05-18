@@ -15,6 +15,9 @@ ${idMobile}        TESTEAUTOMATIZADO
 
 *** Test Cases ***
 
+Start Recording
+        Start Screen Recording    1800s
+
 Rota de Coleta Unificada
     [Tags]    Cadastro    Coleta    Rota
     
@@ -56,16 +59,19 @@ Cadastro Coleta Acumulativa
 
     @{permissao}    Create List    ${cfgmColAcu}
     ${acesso}    Permissao Acesso Mobile    @{permissao}
-    Skip
+    
     
     Remover Notificação
-    Menu Superior    Coletas
+    Sleep    1
+    Remover Notificação
+    Capture Page Screenshot
+    #Menu Superior    Coletas
     Wait Until Page Contains    Coleta Acumulativa
     
     Click Text       Coleta Acumulativa
     Wait Until Page Contains    Pesquisa - Aplicação - Coleta Acumulativa
     
-    Click Element    android=UiSelector().className("android.view.ViewGroup").instance(15)
+    Click Element    android=new UiSelector().className("android.view.ViewGroup").instance(24)
     Wait Until Element Is Visible    ${btnNew}
     Click Element    ${btnNew}
     Wait Until Page Contains    Última Leitura:
@@ -90,7 +96,7 @@ Cadastro Coleta Tendência
     Click Text       Coleta de Tendência
     Wait Until Page Contains    Pesquisa - Aplicação - Coleta Tendência
     
-    Click Element    android=UiSelector().className("android.view.ViewGroup").instance(15)
+    Click Element    android=new UiSelector().className("android.view.ViewGroup").instance(24)
     Wait Until Element Is Visible    ${btnNew}
     Click Element    ${btnNew}
     Wait Until Page Contains    Última Leitura:
@@ -99,3 +105,5 @@ Cadastro Coleta Tendência
 
     Navegar Menu Principal
 
+Stop Recording
+    Stop Screen Recording    Coletas
