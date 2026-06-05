@@ -44,12 +44,10 @@ Rota de Coleta Unificada
     Wait Until Page Contains    Configuração para Rota de Coleta
     
     Click Element    ${btnCarregarRota}
-    Preencher Rota de Coleta
+    #Preencher Rota de Coleta
+    Nova Nova Rota de Coleta
 
-    Click Salvar
-    Click Salvar
-    Wait Until Page Contains    Configuração para Rota de Coleta    60
-    
+  
     Navegar Menu Principal
 
 Cadastro Coleta Acumulativa

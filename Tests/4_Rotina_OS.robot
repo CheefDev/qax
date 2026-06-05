@@ -44,27 +44,27 @@ Cadastro OS Local
     ${editSolicitacao}     Set Variable    //androidx.drawerlayout.widget.DrawerLayout/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[2]/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[4]/android.view.ViewGroup
     ${sFornecedor}         Set Variable    android=new UiSelector().className("android.widget.ImageView").instance(12)
     ${sPlano}              Set Variable    android=new UiSelector().className("android.widget.ImageView").instance(15)
-    ${sTipoManut}          Set Variable    android=new UiSelector().className("android.widget.ImageView").instance(6)
-    ${sSetorExec}          Set Variable    android=new UiSelector().className("android.widget.ImageView").instance(9)
-    ${sAplicacao}          Set Variable    android=new UiSelector().className("android.widget.ImageView").instance(12)
-    ${sCentroCusto}        Set Variable    android=new UiSelector().className("android.widget.ImageView").instance(15)
+    ${sTipoManut}          Set Variable    android=new UiSelector().className("android.widget.ImageView").instance(3)
+    ${sSetorExec}          Set Variable    android=new UiSelector().className("android.widget.ImageView").instance(6)
+    ${sAplicacao}          Set Variable    android=new UiSelector().className("android.widget.ImageView").instance(9)
+    ${sCentroCusto}        Set Variable    android=new UiSelector().className("android.widget.ImageView").instance(12)
     
-    ${btnOk}               Set Variable    //android.widget.Button[@resource-id="android:id/button2"]
-    ${btnSim}              Set Variable    //android.widget.Button[@resource-id="android:id/button1"]
-    ${newOSButton}         Set Variable    //android.widget.Button
+    ${btnOk}               Set Variable    android=new UiSelector().resourceId("android:id/button2")
+    ${btnSim}              Set Variable    android=new UiSelector().resourceId("android:id/button1")
+    ${newOSButton}         Set Variable    android=new UiSelector().className("android.widget.Button")
 
     ${flagRegSalvo}        Set Variable    ${False}
     
     
 
     Voltar Para    Início
-    Sleep    1
+    Sleep    1s
     Remover Notificação
     Wait Until Page Contains   Início
     
-    Sleep    1
+    Sleep    1s
     Remover Notificação    
-    Sleep    1
+    Sleep    1s
     Remover Notificação
     
     ${menuSuperior}    Set Variable    //android.widget.ImageButton[@content-desc="Abrir gaveta de navegação"]
@@ -111,7 +111,8 @@ Cadastro OS Local
     Wait Until Page Contains    Cadastro da O.S.    10
     
     Descer Tela
-    Sleep    2
+    Sleep    1s
+    
     Campo Pesquisa    ${sTipoManut}
     Wait Until Page Contains    Cadastro da O.S.    10
 
@@ -125,7 +126,7 @@ Cadastro OS Local
     Wait Until Page Contains    Cadastro da O.S.    10
     
     Click Salvar
-    Sleep    20
+    Sleep    2s
     
     IF    ${flagRegSalvo} == ${False}
         
@@ -143,13 +144,11 @@ Cadastro OS Local
 
     END
     
-    Wait Until Page Contains    Salvando registro
-    
-    Mensagem    As seguintes O.S.'s já estão abertas   Sim
 
-    ${msg}    Set Variable    android=UiSelector().resourceId("android:id/message")
-    Wait Until Page Contains    validada no servidor com sucesso!    30
     
+    Wait Until Page Contains    validada no servidor com sucesso!    30
+    ${msg}    Set Variable    android=UiSelector().resourceId("android:id/message")
+
     ${textoMsg}               Get Element Attribute    ${msg}    text
     ${parts}                  Split String             ${textoMsg}
     ${codigoOS}               Set Variable             ${parts}[4]
@@ -206,9 +205,10 @@ Encerramento
     Campo Pesquisa    ${produto}            BATATA
     Campo Pesquisa    ${motAtraso}          FALTA DE FERRAMENTAL
     
-    Inserir Texto        ${interfReal}      5
-    
-    Inserir Texto        ${interfRealpc}    100     
+    Click Element       ${interfReal}
+    Teclado Numerico    5
+    Click Element       ${interfRealpc}    
+    Teclado Numerico    100    
 
     Click Salvar
     Wait Until Page Contains    Cadastro
@@ -503,6 +503,12 @@ Marcar Registros Serviço Como Executado
                 ${codigoServico}    Set Variable               //androidx.recyclerview.widget.RecyclerView/android.view.ViewGroup[${i}]//android.widget.TextView
                 ${codigoServico}    Get Element Attribute      ${codigoServico}    text
                 ${labelAplicacao}   Set Variable               ${servico}//(android.widget.TextView[@text="Aplicação: "])
+                ${visible}          Run Keyword And Return Status    Expect Element   ${labelAplicacao}    visible
+
+                IF     ${visible} == False:
+                    Swipe    start_x=${103}    start_y=${1000}    end_x=${111}    end_y=${800}    duration=500ms
+                END
+                
                 ${aplicacao}        Get Element Attribute      ${labelAplicacao}/following-sibling::*    text
 
                 ${jaVerificado}    Run Keyword And Return Status    List Should Contain Value    ${listaVerificados}    ${codigoServico}

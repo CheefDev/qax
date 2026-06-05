@@ -18,7 +18,9 @@ Resource    ../Config/flags.resource
 ${user}            victor.faria
 
 #Manter o ${appName} todo minúsculo pois pode causar erros ao tentar abrir o app após a geração do banco de dados.
-${appName}         engesp
+${appName}         econit
+#${appPackage}      com.engemanmaui.${appName}
+${appPackage}      com.engemanmaui.econit
 ${webservice}      wsdev.engeman.com:8443/wsmaui${appName}
 ${saveButton}      //android.widget.ImageButton[@content-desc="Navigate up"] 
 
@@ -27,7 +29,6 @@ ${menuOptions}     //android.widget.ImageView[@content-desc="Mais opções"]
 ${btnVoltar}       android=UiSelector().className("android.widget.ImageView").instance(0)
 ${btnSalvar}       android=UiSelector().className("android.widget.ImageView").instance(0)
 ${message}         //android.widget.TextView[@resource-id="android:id/message"]
-${appPackage}      com.engemanmaui.${appName}
 ${deviceName}      emulator-5554
 
 #Modo USBcampo
@@ -111,11 +112,11 @@ Campo Pesquisa
     IF    '${text}' == '1'
         #Seleciona o primeiro item
         Click Element    ${btnPesquisar}
-        Sleep    3
+        Sleep    1s
         #Wait Until Page Does Not Contain    Carregando    30
         Run Keyword And Ignore Error    Click Element  ${primeiroItem}
     ELSE
-        Sleep    3
+        Sleep    1s
         ${visivel}=    Run Keyword And Return Status    Page Should Contain Text    ${text}
     
     IF    ${visivel}
@@ -125,19 +126,19 @@ Campo Pesquisa
 
         Click Text    ${text}
         Log To Console    \nSelecinado: ${textoItem}\n
-        Sleep    5
+        Sleep    1s
     
     ELSE
         
         Input Text    ${cFiltroPesquisa}    ${text}
         Click Element    ${btnPesquisar}
         Wait Until Page Does Not Contain    Carregando
-        ${item}    Set Variable    android=UiSelector().textContains("${text}").instance(1)
+        ${item}         Set Variable    android=UiSelector().textContains("${text}").instance(1)
         ${textoItem}    Get Element Attribute    ${item}    text
 
         Click Element    ${item}
         Log To Console    \nSelecinado: ${textoItem}\n
-        Sleep    5
+        #Sleep    5
     END
 
     END
@@ -145,7 +146,7 @@ Campo Pesquisa
 
 Descer Tela
     
-    Swipe    start_x=${486}    start_y=${1980}    end_x=${486}    end_y=${700}    duration=500ms
+    Swipe    start_x=${486}    start_y=${1980}    end_x=${486}    end_y=${695}    duration=500ms
 
 Navegar Menu Principal
     ${continue}    Set Variable    True
@@ -190,8 +191,8 @@ Campo Data
         ${location}         Get Element Location    android=UiSelector().text("Minutos")
         ${offset}           Set Variable    100
         #${newY}             Evaluate       ${location['y']} + ${offset}
-        ${campoHours}       Set Variable   //android.widget.FrameLayout[@resource-id="com.engemanmaui.${appName}:id/navigationlayout_content"]/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[2]/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.widget.EditText[1]
-        ${campoMinutes}     Set Variable   //android.widget.FrameLayout[@resource-id="com.engemanmaui.${appName}:id/navigationlayout_content"]/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[2]/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.widget.EditText[2]
+        ${campoHours}       Set Variable   //android.widget.FrameLayout[@resource-id="${appPackage}:id/navigationlayout_content"]/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[2]/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.widget.EditText[1]
+        ${campoMinutes}     Set Variable   //android.widget.FrameLayout[@resource-id="${appPackage}:id/navigationlayout_content"]/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[2]/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.widget.EditText[2]
         #@{newPosition}      Create List    ${location['x']}    ${newY}
         #Tap With Positions    500          ${newPosition}
 
@@ -220,11 +221,11 @@ Campo Data
         END
 
         
-        ${selectMinutes}    Set Variable    //android.widget.ListView[@resource-id="com.engemanmaui.${appName}:id/select_dialog_listview"]/android.widget.CheckedTextView[@text="${newMinutes}"]
+        ${selectMinutes}    Set Variable    //android.widget.ListView[@resource-id="${appPackage}:id/select_dialog_listview"]/android.widget.CheckedTextView[@text="${newMinutes}"]
        
         Wait Until Page Contains Element    ${selectMinutes}
         Click Element    ${selectMinutes}
-        Sleep    1
+        Sleep    1s
     
     Wait Until Element Is Visible   //*[contains(@text,"OK")] 
     Click Text     OK
@@ -333,13 +334,13 @@ Preencher Rota de Coleta
                 
                 IF    $is_visible == False
                     Swipe    start_x=${450}    start_y=${2000}    end_x=${450}    end_y=${1750}    duration=1000ms
-                    Sleep    0.5
+                    Sleep    500ms
                     ${is_visible}=    Run Keyword And Return Status    Expect Element   ${item}    visible
                 END
                 
                 
                 ${bounds}    Get Element Attribute    ${item}     bounds
-                ${campo}    Set Variable        ${item}/following-sibling::android.widget.EditText[1]
+                ${campo}     Set Variable        ${item}/following-sibling::android.widget.EditText[1]
                 #${textValor}    Set Variable    ${item}/following-sibling::android.widget.TextView[3]
                 ${iText}          Get Element Attribute    ${item}    text
                 #Log To Console    \n${iText}\n
@@ -348,7 +349,7 @@ Preencher Rota de Coleta
                 
                 IF    $is_visible == False
                     Swipe    start_x=${450}    start_y=${2000}    end_x=${450}    end_y=${1750}    duration=1000ms
-                    Sleep    0.5
+                    Sleep    500ms
                     ${campo}    Set Variable        ${item}/following-sibling::android.widget.EditText[1]
                     ${is_visible}=    Run Keyword And Return Status    Expect Element   ${item}    visible
                 END
@@ -381,7 +382,7 @@ Preencher Rota de Coleta
                 
             
         END
-        Swipe    start_x=${450}    start_y=${2000}    end_x=${450}    end_y=${1200}    duration=1000ms
+        Swipe    start_x=${450}    start_y=${2000}    end_x=${450}    end_y=${1300}    duration=1000ms
         Sleep    1
     END
 
@@ -412,7 +413,7 @@ Preencher Coleta Unificada
                 
                 IF    $is_visible == False
                     Swipe    start_x=${450}    start_y=${2000}    end_x=${450}    end_y=${1750}    duration=1000ms
-                    Sleep    0.5
+                    Sleep    500ms
                     ${is_visible}=    Run Keyword And Return Status    Expect Element   ${item}    visible
                 END
                 
@@ -428,7 +429,7 @@ Preencher Coleta Unificada
                 
                 IF    $is_visible == False
                     Swipe    start_x=${450}    start_y=${2000}    end_x=${450}    end_y=${1750}    duration=1000ms
-                    Sleep    0.5
+                    Sleep    500ms
                     ${is_visible}=    Run Keyword And Return Status    Expect Element   ${item}    visible
                 END
                 ${textoCampo}    Get Element Attribute    ${campo}    text
@@ -445,8 +446,8 @@ Preencher Coleta Unificada
                     
                         
                     ${newValor}    Evaluate    ${valor} + 1
-                    #Click Element    ${campo}
-                    Inserir Texto    ${campo}    ${newValor}
+                    Click Element    ${campo}
+                    Teclado Numerico    ${newValor}
 
                     #Log To Console    \n${newValor}\n
                     ${coletas}    Evaluate    ${coletas} + 1
@@ -531,8 +532,8 @@ Preencher Coleta Unificada OS
                     
                         
                     ${newValor}    Evaluate    ${valor} + 1
-                    #Click Element    ${campo}
-                    Inserir Texto    ${campo}    ${newValor}
+                    Click Element    ${campo}
+                    Teclado Numerico    ${newValor}
 
                     #Log To Console    \n${newValor}\n
                     ${coletas}    Evaluate    ${coletas} + 1
@@ -772,7 +773,7 @@ Long Click
         ${center_y}=    Evaluate    ${y} + ${height} / 2
         @{positions}    Create List    ${center_x}    ${center_y}   
         
-        Tap With Positions    ${1000}    ${positions}
+        Tap With Positions    1.2s    ${positions}
 
 Inserir Texto
     [Arguments]    ${locator}    ${text}
@@ -931,8 +932,176 @@ Teclado Numerico
     FOR    ${char}    IN    @{characters}
         
         Click Element    android=new UiSelector().text("${char}")
-        #Sleep    0.5
+        #Sleep    0.5s
         
     END
 
     Click Element    android=new UiSelector().text("OK")
+
+Nova Rota de Coleta
+
+    Wait Until Page Contains    Rota de Coleta
+
+    #Swipe no início para alinhar os itens de coleta tirando o separador do topo da tela.
+    Swipe    start_x=${450}    start_y=${2000}    end_x=${450}    end_y=${1900}    duration=500ms
+    Sleep    0.5s
+
+    #Número de coletas presentes na rota, para controlar o loop de preenchimento
+    ${numeroColetas}    Get Element Attribute    android=new UiSelector().className("android.widget.TextView").instance(2)   text
+    ${parts}           Split String             ${numeroColetas}
+    ${registros}       Set Variable             ${parts}[6]
+    Log To Console    \nNúmero de Registros na Rota: ${registros}\n
+
+    #Número de coletas já preenchidas.
+    ${coletas}    Set Variable    0
+    
+    #Enquanto o número de coletas preenchidas for menor que o número de registros, continuar preenchendo.
+    WHILE   ${coletas} < ${registros}
+        ${coletasNesseLoop}    Set Variable    0
+        #Aparecem no máximo 3 coletas por tela, o loop vai pegar o label Valor e verificar se o campo editText está visivel, depois preencher a coleta.
+        FOR    ${i}   IN RANGE    0    3
+            
+            # ${j}    Evaluate    1 + 2*${i}
+
+            ${labelValor}    Set Variable    android=UiSelector().textContains("Valor").instance(${i})
+            ${textoCampo}    Get Element Attribute    ${labelValor}    text
+                        
+            ${parts}               Split String             ${textoCampo}
+            ${valor}               Set Variable             ${parts}[3]
+            ${valor}               Remove String            ${valor}    )
+            ${valor}               Replace String           ${valor}    ,    ${SPACE}
+
+            ${parts}               Split String    ${valor}
+            ${valor}               Set Variable    ${parts}[0]
+            ${valor}               Remove String            ${valor}    ${SPACE}
+
+            Log To Console    \nValor Atual: ${valor}\n
+            
+            #Encontrar o primeiro campo EditText vazio e preencher com o novo valor, caso não esteja visível, dar scroll e verificar novamente até encontrar o campo ou preencher os 3 campos da tela.
+            FOR    ${j}    IN RANGE    0    6
+                
+                
+                ${campoVisivel}=    Run Keyword And Return Status    Expect Element   android=UiSelector().className("android.widget.EditText").instance(${j})    visible   
+
+                Log To Console    Campo Visível: ${campoVisivel}\n
+                IF    ${campoVisivel} == True
+                    
+                    ${campo}    Set Variable    android=UiSelector().className("android.widget.EditText").instance(${j})
+
+                    ${textoCampo}    Get Element Attribute    ${campo}    text
+                    IF    $textoCampo != ""
+                        Log To Console    Campo já preenchido, verificando próximo...\n
+                        CONTINUE
+                    END
+                    Click Element    ${campo}
+                    ${newValor}    Evaluate    ${valor} + 1
+                    Teclado Numerico   ${newValor}
+                    Log To Console    Coleta registrada com Sucesso!\n
+                    ${coletas}    Evaluate    ${coletas} + 1
+                    Log To Console    Coletas Registradas: ${coletas}\n
+                    ${coletasNesseLoop}    Evaluate    ${coletasNesseLoop} + 1
+                    Log To Console    Coletas Nesse Loop: ${coletasNesseLoop}\n
+
+                    BREAK
+                
+                END
+            END
+
+            IF    ${coletasNesseLoop} == 0
+                Swipe    start_x=${450}    start_y=${2000}    end_x=${450}    end_y=${1000}    duration=1000ms
+                Sleep    0.5s
+            END
+        END
+
+        Swipe    start_x=${450}    start_y=${2000}    end_x=${450}    end_y=${1000}    duration=1000ms
+        Sleep    0.5s
+    END
+
+Nova Nova Rota de Coleta
+     
+    Wait Until Page Contains    Rota de Coleta
+
+    #Swipe no início para alinhar os itens de coleta tirando o separador do topo da tela.
+    Swipe    start_x=${450}    start_y=${2000}    end_x=${450}    end_y=${1850}    duration=500ms
+    Sleep    0.5s
+
+    #Número de coletas presentes na rota, para controlar o loop de preenchimento
+    ${numeroColetas}    Get Element Attribute    android=new UiSelector().className("android.widget.TextView").instance(2)   text
+    ${parts}           Split String             ${numeroColetas}
+    ${registros}       Set Variable             ${parts}[6]
+    Log To Console    \nNúmero de Registros na Rota: ${registros}\n
+
+    #Número de coletas já preenchidas.
+    ${coletas}    Set Variable    0
+    
+    WHILE   ${coletas} < ${registros}
+        
+        FOR    ${i}   IN RANGE    0    3
+            
+            ${labelValor}    Set Variable    android=UiSelector().textContains("Valor").instance(${i})
+            
+            ${visible}=    Run Keyword And Return Status    Expect Element   ${labelValor}    visible
+            IF    ${visible} == False
+                BREAK
+            END
+            
+            ${textoCampo}    Get Element Attribute    ${labelValor}    text
+                            
+            ${parts}               Split String             ${textoCampo}
+            ${valor}               Set Variable             ${parts}[3]
+            ${valor}               Remove String            ${valor}    )
+            ${valor}               Replace String           ${valor}    ,    ${SPACE}
+
+            ${parts}               Split String    ${valor}
+            ${valor}               Set Variable    ${parts}[0]
+            ${valor}               Remove String            ${valor}    ${SPACE}
+
+            Log To Console    \nValor Atual: ${valor}\n
+
+
+            ${campo}=    Set Variable    ${labelValor}.fromParent(className("android.widget.EditText").instance(1))
+            ${visible}=    Run Keyword And Return Status    Expect Element   ${campo}    visible
+
+            IF    ${visible} == False
+                Swipe    start_x=${450}    start_y=${2000}    end_x=${450}    end_y=${1850}    duration=500ms  
+                Sleep    0.5s
+                BREAK
+            END
+            
+             
+
+            ${textoCampo}    Get Element Attribute    ${campo}    text
+            IF    $textoCampo != ""
+                Log To Console    Campo já preenchido, verificando próximo...\n
+                CONTINUE
+            END
+            
+
+            Click Element    ${campo}
+            ${tecladoApareceu}=    Run Keyword And Return Status    Expect Element   android=UiSelector().text("OK")    visible
+            IF    ${tecladoApareceu}== False
+                Swipe    start_x=${450}    start_y=${2000}    end_x=${450}    end_y=${1950}    duration=500ms 
+                Log To Console    Teclado não apareceu, dando click novamente no campo...\n 
+                Sleep    0.5s
+                Click Element    ${campo}    
+            END
+            
+            ${newValor}    Evaluate    ${valor} + 1
+            Teclado Numerico   ${newValor}
+            Sleep    0.5s
+            Log To Console    Coleta registrada com Sucesso!\n
+            ${coletas}    Evaluate    ${coletas} + 1
+            Log To Console    Coletas Registradas: ${coletas}\n
+        END
+        Swipe    start_x=${450}    start_y=${2300}    end_x=${450}    end_y=${700}    duration=1500ms
+    END
+        
+    Click Salvar
+    
+    Wait Until Page Contains    Configuração para Rota de Coleta    120s
+
+    Log To Console    Rota de Coleta finalizada com Sucesso!\n
+
+#Locator novo para o campo valor e campo editText.
+#${labelValor}=    Set Variable    new UiSelector().textContains("Valor").instance(${i})
+#${campo}=    Set Variable    ${labelValor}.fromParent(className("android.widget.EditText").instance(1))
